@@ -90,7 +90,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
       {/* Password modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-          <div className="bg-card border-2 border-border rounded-xl p-8 max-w-sm w-full mx-4 flex flex-col items-center gap-4">
+          <div className="bg-card border-2 border-border rounded-xl p-6 sm:p-8 max-w-sm w-[calc(100%-2rem)] sm:w-full mx-4 flex flex-col items-center gap-4">
             <span className="text-4xl">🔐</span>
             <h2 className="font-arcade text-sm text-secondary text-center">
               Secret Characters
