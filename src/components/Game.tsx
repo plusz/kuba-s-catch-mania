@@ -25,14 +25,12 @@ const STORAGE_KEY = 'catch-game-best-score';
 /**
  * HOW CATCHING WORKS (discrete step system):
  * 
- * 1. Objects move in discrete steps (0 to TOTAL_STEPS=8), one step per "tick".
+ * 1. Objects move in discrete steps (0 to 7), one step per "tick".
  * 2. Tick interval starts at 1000ms (1/sec) and speeds up to 100ms (10/sec).
- * 3. When an object reaches step CATCH_STEP (7), it's in the "catch zone".
+ * 3. When an object reaches step CATCH_STEP (7), it's at ramp end (catch zone).
  * 4. The player must press the matching direction key (A/Z/L/M) while the
- *    object is at step 7. The key press instantly checks all objects at step 7
- *    with that direction and catches the first match.
- * 5. If an object at step 7 is NOT caught by the next tick, it advances past
- *    TOTAL_STEPS → game over (missed).
+ *    object is at step 7. The key press checks objects at step 7 for that direction.
+ * 5. If an object at step 7 is NOT caught by the next tick, it misses and game ends.
  * 6. Objects are never spawned if they'd arrive at the catch zone too close
  *    to another object (MIN_ARRIVAL_GAP_STEPS=3), so the player always has
  *    time to react between catches.
