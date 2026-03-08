@@ -54,6 +54,7 @@ const Index = () => {
       setShowWarning(true);
       return;
     }
+    setGameKey((k) => k + 1);
     setPhase('playing');
   };
 
