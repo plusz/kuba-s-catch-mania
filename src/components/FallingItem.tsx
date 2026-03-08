@@ -7,6 +7,8 @@ interface FallingItemProps {
   emoji: string;
   /** Optional image to render instead of emoji */
   objectImage?: string;
+  /** Character ID for per-character sizing */
+  characterId?: string;
 }
 
 const DESKTOP_LANES: Record<Direction, { startX: number; startY: number; endX: number; endY: number }> = {
