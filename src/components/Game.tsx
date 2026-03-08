@@ -75,7 +75,7 @@ const Game = ({ character, onMenu }: GameProps) => {
 
     const currentObjects = objectsRef.current;
     const catchable = currentObjects.find(
-      (obj) => !obj.caught && obj.direction === dir && obj.step === CATCH_STEP
+      (obj) => !obj.caught && obj.direction === dir && obj.step >= CATCH_STEP - 1
     );
 
     if (catchable) {
@@ -192,7 +192,7 @@ const Game = ({ character, onMenu }: GameProps) => {
 
       <GameHud score={score} level={level} currentPose={currentPose} />
 
-      <div className="absolute z-10" style={{ left: '50%', top: '55%', transform: 'translate(-50%, -50%)' }}>
+      <div className="absolute z-10" style={{ left: '50%', top: '65%', transform: 'translate(-50%, -50%)' }}>
         <CharacterSprite character={character} pose={currentPose} />
       </div>
 
