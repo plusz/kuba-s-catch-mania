@@ -188,7 +188,7 @@ const Game = ({ character, onMenu }: GameProps) => {
         backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 bg-background/10" />
+      
 
       <GameHud score={score} level={level} currentPose={currentPose} />
 
