@@ -13,3 +13,12 @@ export function trackGameOver(score: number, level: number) {
     });
   }
 }
+
+export function trackPlayTime(minutes: number) {
+  if (window.gtag) {
+    window.gtag('event', 'play_time_milestone', {
+      event_category: 'game',
+      minutes,
+    });
+  }
+}
