@@ -148,6 +148,7 @@ const Game = ({ character, onMenu }: GameProps) => {
         setShaking(true);
         setTimeout(() => setShaking(false), 300);
         setGameOver(true);
+        trackGameOver(scoreRef.current, getLevel(scoreRef.current));
         return updated;
       }
 
