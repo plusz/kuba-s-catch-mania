@@ -12,7 +12,7 @@ interface FallingItemProps {
  */
 const FallingItem = ({ object, emoji }: FallingItemProps) => {
   const { direction, step } = object;
-  const progress = step / TOTAL_STEPS;
+  const progress = Math.min(step, CATCH_STEP) / CATCH_STEP;
 
   const lanes: Record<Direction, { startX: number; startY: number; endX: number; endY: number }> = {
     'top-left': { startX: 5, startY: 10, endX: 42, endY: 40 },

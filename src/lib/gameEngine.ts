@@ -6,13 +6,12 @@ import type { Direction, FallingObject } from './gameTypes';
  * Objects move in discrete steps (like classic handheld games).
  * Each step makes a "tick" sound so the player hears the rhythm.
  * 
- * Total steps per lane: 8 (steps 0-7)
- * Step 7 = catch zone. Player must be in correct pose when object reaches step 7.
+ * Total steps per lane: 8 visual positions (0-7)
+ * Step 7 = catch zone (end of ramp).
  * If object is at step 7 and not caught, next tick = miss → game over.
  */
 
-export const TOTAL_STEPS = 8;
-export const CATCH_STEP = 7; // last step = catch zone
+export const CATCH_STEP = 7;
 
 /** Starting interval between ticks: 1000ms (1 step/sec) */
 export const INITIAL_TICK_MS = 1000;
