@@ -20,6 +20,7 @@ const Index = () => {
   const [character, setCharacter] = useState<GameCharacter | null>(null);
   const [showWarning, setShowWarning] = useState(false);
   const [showLock, setShowLock] = useState(() => isLocked());
+  const [gameKey, setGameKey] = useState(0);
 
   const handleSelectCharacter = (char: GameCharacter) => {
     setCharacter(char);
