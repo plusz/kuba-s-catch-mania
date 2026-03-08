@@ -43,7 +43,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
   const isMobile = useIsMobile();
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-  const [currentPose, setCurrentPose] = useState<Direction | null>(null);
+  const [currentPose, setCurrentPose] = useState<Direction | null>('top-left');
   const [objects, setObjects] = useState<FallingObject[]>([]);
   const [shaking, setShaking] = useState(false);
   const [debugLines, setDebugLines] = useState<string[]>([]);
