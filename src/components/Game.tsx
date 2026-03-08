@@ -77,7 +77,7 @@ const Game = ({ character, onMenu }: GameProps) => {
   const handleDirection = useCallback((dir: Direction) => {
     if (gameOverRef.current) return;
     setCurrentPose(dir);
-
+    poseRef.current = dir; // sync immediately for doTick
     const currentObjects = objectsRef.current;
     const catchable = currentObjects.find(
       (obj) => !obj.caught && obj.direction === dir && obj.step >= CATCH_STEP - 1
