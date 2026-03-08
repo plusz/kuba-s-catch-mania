@@ -97,11 +97,14 @@ const Game = ({ character, onMenu }: GameProps) => {
       const updated = prev.map((obj) => {
         if (obj.caught) return obj;
         const newStep = obj.step + 1;
-        if (newStep > TOTAL_STEPS) {
+        if (newStep > CATCH_STEP) {
           missed = true;
+          return { ...obj, step: CATCH_STEP };
         }
         return { ...obj, step: newStep };
       }).filter((obj) => !obj.caught);
+
+      objectsRef.current = updated;
 
       if (missed) {
         playMissSound();
