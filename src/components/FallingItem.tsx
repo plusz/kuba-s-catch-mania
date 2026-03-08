@@ -27,7 +27,7 @@ const FallingItem = ({ object, emoji }: FallingItemProps) => {
   const lane = lanes[direction];
   const x = lane.startX + (lane.endX - lane.startX) * progress;
   const y = lane.startY + (lane.endY - lane.startY) * progress;
-  const scale = 0.6 + progress * 0.6;
+  const scale = 1.2 + progress * 1.2;
 
   return (
     <div
