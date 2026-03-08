@@ -269,7 +269,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
         <GameOverModal
           score={score}
           bestScore={bestScore}
-          onPlayAgain={() => { handlePlayAgain(); onNewGame(); }}
+          onPlayAgain={onNewGame}
           onMenu={onMenu}
         />
       )}
