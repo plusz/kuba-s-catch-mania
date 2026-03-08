@@ -41,6 +41,7 @@ const Game = ({ character, onMenu }: GameProps) => {
   const [currentPose, setCurrentPose] = useState<Direction | null>(null);
   const [objects, setObjects] = useState<FallingObject[]>([]);
   const [shaking, setShaking] = useState(false);
+  const [debugLines, setDebugLines] = useState<string[]>([]);
 
   const scoreRef = useRef(0);
   const objectsRef = useRef<FallingObject[]>([]);
@@ -68,7 +69,11 @@ const Game = ({ character, onMenu }: GameProps) => {
     }
   }, [gameOver, score, bestScore]);
 
-  // Handle direction input — check for catchable objects at CATCH_STEP
+  const appendDebug = useCallback((line: string) => {
+    setDebugLines((prev) => [...prev.slice(-10), line]);
+  }, []);
+
+  // Handle direction input — check for catchable objects near ramp end
   const handleDirection = useCallback((dir: Direction) => {
     if (gameOverRef.current) return;
     setCurrentPose(dir);
@@ -76,6 +81,12 @@ const Game = ({ character, onMenu }: GameProps) => {
     const currentObjects = objectsRef.current;
     const catchable = currentObjects.find(
       (obj) => !obj.caught && obj.direction === dir && obj.step >= CATCH_STEP - 1
+    );
+
+    appendDebug(
+      `INPUT dir=${dir} pose=${dir} objs=${currentObjects
+        .map((o) => `${o.direction}@${o.step}`)
+        .join(',') || 'none'} catch=${catchable ? `${catchable.direction}@${catchable.step}` : 'none'}`
     );
 
     if (catchable) {
@@ -86,28 +97,46 @@ const Game = ({ character, onMenu }: GameProps) => {
         return updated;
       });
       setScore((prev) => prev + 1);
+      appendDebug(`CAUGHT dir=${dir} step=${catchable.step}`);
     }
-  }, []);
+  }, [appendDebug]);
 
   useGameControls(handleDirection, !gameOver);
 
-  /** One game tick: advance all objects by 1 step, check misses, maybe spawn */
+  /** One game tick: advance all objects by 1 step, auto-catch by current pose, check misses, maybe spawn */
   const doTick = useCallback(() => {
     if (gameOverRef.current) return;
 
     let missed = false;
+    let caughtByPoseCount = 0;
+    let updatedSnapshot: FallingObject[] = [];
 
     setObjects((prev) => {
-      const updated = prev.map((obj) => {
-        if (obj.caught) return obj;
-        const newStep = obj.step + 1;
-        if (newStep > CATCH_STEP) {
-          missed = true;
-          return { ...obj, step: CATCH_STEP };
-        }
-        return { ...obj, step: newStep };
-      }).filter((obj) => !obj.caught);
+      const updated = prev
+        .map((obj) => {
+          if (obj.caught) return obj;
 
+          const poseCatch =
+            !!poseRef.current &&
+            obj.direction === poseRef.current &&
+            obj.step >= CATCH_STEP - 1;
+
+          if (poseCatch) {
+            caughtByPoseCount++;
+            return null;
+          }
+
+          const newStep = obj.step + 1;
+          if (newStep > CATCH_STEP) {
+            missed = true;
+            return { ...obj, step: CATCH_STEP };
+          }
+
+          return { ...obj, step: newStep };
+        })
+        .filter((obj): obj is FallingObject => obj !== null && !obj.caught);
+
+      updatedSnapshot = updated;
       objectsRef.current = updated;
 
       if (missed) {
@@ -121,7 +150,22 @@ const Game = ({ character, onMenu }: GameProps) => {
       return updated;
     });
 
-    if (missed) return;
+    if (caughtByPoseCount > 0) {
+      playCatchSound();
+      setScore((prev) => prev + caughtByPoseCount);
+      appendDebug(`AUTO-CAUGHT count=${caughtByPoseCount} pose=${poseRef.current}`);
+    }
+
+    appendDebug(
+      `TICK pose=${poseRef.current ?? 'none'} objs=${updatedSnapshot
+        .map((o) => `${o.direction}@${o.step}${o.direction === poseRef.current && o.step >= CATCH_STEP - 1 ? '[match]' : ''}`)
+        .join(',') || 'none'}`
+    );
+
+    if (missed) {
+      appendDebug('MISS -> game over');
+      return;
+    }
 
     // Play step sound for each tick (audible rhythm)
     playStepSound();
@@ -133,9 +177,10 @@ const Game = ({ character, onMenu }: GameProps) => {
       if (newObj) {
         setObjects((prev) => [...prev, newObj]);
         ticksSinceSpawnRef.current = 0;
+        appendDebug(`SPAWN ${newObj.direction}@${newObj.step}`);
       }
     }
-  }, []);
+  }, [appendDebug]);
 
   /** Start or restart the tick interval */
   const startTickLoop = useCallback(() => {
@@ -173,6 +218,7 @@ const Game = ({ character, onMenu }: GameProps) => {
     setObjects([]);
     setCurrentPose(null);
     setGameOver(false);
+    setDebugLines([]);
     gameOverRef.current = false;
     ticksSinceSpawnRef.current = 10;
   };
@@ -200,7 +246,19 @@ const Game = ({ character, onMenu }: GameProps) => {
         <FallingItem key={obj.id} object={obj} emoji={objectEmoji} />
       ))}
 
-
+      <div className="absolute left-2 bottom-2 z-30 max-w-[92vw] rounded-md border border-border bg-card/85 p-2 text-xs text-card-foreground">
+        <div className="font-semibold">DEBUG CATCH</div>
+        <div>pose: {currentPose ?? 'none'} | catchWindow: step ≥ {CATCH_STEP - 1}</div>
+        {debugLines.length === 0 ? (
+          <div>brak logów…</div>
+        ) : (
+          <div className="mt-1 max-h-36 overflow-auto space-y-0.5">
+            {debugLines.map((line, idx) => (
+              <div key={`${idx}-${line}`}>{line}</div>
+            ))}
+          </div>
+        )}
+      </div>
       {gameOver && (
         <GameOverModal
           score={score}
