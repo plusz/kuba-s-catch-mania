@@ -29,8 +29,8 @@ const GameHud = ({ score, level, currentPose }: GameHudProps) => {
       {directions.map((dir) => {
         const isActive = currentPose === dir;
         const posClass = {
-          'top-left': 'top-16 left-4',
-          'top-right': 'top-16 right-4',
+          'top-left': 'top-20 left-4',
+          'top-right': 'top-20 right-4',
           'bottom-left': 'bottom-4 left-4',
           'bottom-right': 'bottom-4 right-4',
         }[dir];
