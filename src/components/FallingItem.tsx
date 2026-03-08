@@ -51,7 +51,7 @@ const FallingItem = ({ object, emoji, objectImage, characterId }: FallingItemPro
           src={objectImage}
           alt=""
           className="drop-shadow-lg"
-          style={{ width: '2rem', height: '2rem', objectFit: 'contain' }}
+          style={{ width: characterId === 'giraffe' ? '2.6rem' : '2rem', height: characterId === 'giraffe' ? '2.6rem' : '2rem', objectFit: 'contain' }}
         />
       ) : (
         <span className="drop-shadow-lg" style={{ fontSize: '2rem' }}>{emoji}</span>
