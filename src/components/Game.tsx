@@ -242,7 +242,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
     >
       
 
-      <GameHud score={score} level={level} currentPose={currentPose} />
+      <GameHud score={score} level={level} currentPose={currentPose} musicEnabled={musicEnabled} onToggleMusic={toggleMusic} />
 
       <div className="absolute z-10" style={{ left: '50%', top: isMobile ? '58%' : '65%', transform: 'translate(-50%, -50%)' }}>
         <CharacterSprite character={character} pose={currentPose} />
