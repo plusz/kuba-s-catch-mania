@@ -226,7 +226,7 @@ const Game = ({ character, onMenu }: GameProps) => {
     ticksSinceSpawnRef.current = 10;
   };
 
-  const objectEmoji = character.id === 'lion' ? '🥩' : '🧀';
+  const objectEmoji = character.objectEmoji;
 
   return (
     <div
@@ -246,7 +246,7 @@ const Game = ({ character, onMenu }: GameProps) => {
       </div>
 
       {objects.map((obj) => (
-        <FallingItem key={obj.id} object={obj} emoji={objectEmoji} />
+        <FallingItem key={obj.id} object={obj} emoji={objectEmoji} objectImage={character.objectImage} />
       ))}
 
       {new URLSearchParams(window.location.search).has('debug') && (

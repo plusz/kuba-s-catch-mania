@@ -16,9 +16,14 @@ export interface GameCharacter {
   name: string;
   displayName: string;
   objectName: string;
+  objectEmoji: string;
+  /** Optional image for falling object (used instead of emoji) */
+  objectImage?: string;
   spriteImage: string;
   /** Sprite sheet layout: 2x2 grid mapping to directions */
   spritePositions: Record<Direction, { row: number; col: number }>;
+  /** Whether this character requires a password to unlock */
+  locked?: boolean;
 }
 
 /** Game state phases */
