@@ -1,6 +1,6 @@
 import type { GameCharacter } from './gameTypes';
-import lionSprites from '@/assets/lion_sprites.png';
-import mouseSprites from '@/assets/mouse_sprites.png';
+import lionSprites from '@/assets/lion_sprites_clean.png';
+import mouseSprites from '@/assets/mouse_sprites_clean.png';
 
 export const CHARACTERS: GameCharacter[] = [
   {
