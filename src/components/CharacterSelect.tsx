@@ -130,6 +130,18 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
           </div>
         </div>
       )}
+
+      {/* Footer */}
+      <div className="mt-12 text-center">
+        <a
+          href="https://www.ZwierzetaDetektywi.pl"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-muted-foreground hover:text-secondary transition-colors"
+        >
+          © 2026 www.ZwierzetaDetektywi.pl
+        </a>
+      </div>
     </div>
   );
 };
