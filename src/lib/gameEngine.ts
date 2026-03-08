@@ -1,42 +1,47 @@
 import type { Direction, FallingObject } from './gameTypes';
 
-/** Game configuration constants */
-export const BASE_FALL_SPEED = 0.4; // progress per second at level 1
-export const SPEED_INCREMENT = 0.05; // speed increase per level
-export const POINTS_PER_LEVEL = 5; // points before leveling up
-export const CATCH_THRESHOLD = 0.85; // progress at which catch is checked
-export const MISS_THRESHOLD = 1.0; // progress at which object is missed
-export const MIN_SPAWN_INTERVAL = 800; // ms minimum between spawns
-export const MAX_SPAWN_INTERVAL = 2000; // ms maximum between spawns
+/**
+ * DISCRETE STEP-BASED GAME ENGINE
+ * 
+ * Objects move in discrete steps (like classic handheld games).
+ * Each step makes a "tick" sound so the player hears the rhythm.
+ * 
+ * Total steps per lane: 8 (steps 0-7)
+ * Step 7 = catch zone. Player must be in correct pose when object reaches step 7.
+ * If object is at step 7 and not caught, next tick = miss → game over.
+ */
+
+export const TOTAL_STEPS = 8;
+export const CATCH_STEP = 7; // last step = catch zone
+
+/** Starting interval between ticks: 1000ms (1 step/sec) */
+export const INITIAL_TICK_MS = 1000;
+/** Minimum interval: 100ms (10 steps/sec) */
+export const MIN_TICK_MS = 100;
+/** How much faster per level (ms reduction) */
+export const TICK_SPEEDUP = 50;
+/** Points per level */
+export const POINTS_PER_LEVEL = 5;
+
+/**
+ * Minimum gap in steps between two objects reaching the catch zone.
+ * This ensures the player always has time to react between catches.
+ * A gap of 3 steps means at least 3 ticks between arrivals.
+ */
+export const MIN_ARRIVAL_GAP_STEPS = 3;
 
 const DIRECTIONS: Direction[] = ['top-left', 'bottom-left', 'top-right', 'bottom-right'];
 
 let nextId = 0;
 
-/** Reset the ID counter */
 export function resetIdCounter() {
   nextId = 0;
 }
 
-/** Spawn a new falling object from a random direction */
-export function spawnObject(): FallingObject {
-  return {
-    id: nextId++,
-    direction: DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)],
-    progress: 0,
-    caught: false,
-  };
-}
-
-/** Calculate current fall speed based on level */
-export function getFallSpeed(level: number): number {
-  return BASE_FALL_SPEED + (level - 1) * SPEED_INCREMENT;
-}
-
-/** Calculate spawn interval based on level (decreases as level increases) */
-export function getSpawnInterval(level: number): number {
-  const interval = MAX_SPAWN_INTERVAL - (level - 1) * 150;
-  return Math.max(MIN_SPAWN_INTERVAL, interval);
+/** Calculate tick interval based on level */
+export function getTickInterval(level: number): number {
+  const interval = INITIAL_TICK_MS - (level - 1) * TICK_SPEEDUP;
+  return Math.max(MIN_TICK_MS, interval);
 }
 
 /** Calculate level from score */
@@ -44,12 +49,43 @@ export function getLevel(score: number): number {
   return Math.floor(score / POINTS_PER_LEVEL) + 1;
 }
 
-/** Check if an object has reached the catch zone */
-export function isInCatchZone(obj: FallingObject): boolean {
-  return obj.progress >= CATCH_THRESHOLD && obj.progress < MISS_THRESHOLD;
+/**
+ * Spawn a new falling object, ensuring it won't arrive at the catch zone
+ * at the same time as any existing object.
+ * 
+ * Returns null if spawning now would cause a simultaneous arrival.
+ */
+export function trySpawnObject(existingObjects: FallingObject[]): FallingObject | null {
+  const direction = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+  
+  // New object starts at step 0, so it arrives at CATCH_STEP after CATCH_STEP ticks.
+  // Check that no existing object will be at CATCH_STEP within MIN_ARRIVAL_GAP_STEPS
+  // of when this new object arrives.
+  const newArrivalTick = CATCH_STEP; // ticks from now until new object reaches catch zone
+  
+  for (const obj of existingObjects) {
+    if (obj.caught) continue;
+    const objTicksToArrive = CATCH_STEP - obj.step;
+    const gap = Math.abs(newArrivalTick - objTicksToArrive);
+    if (gap < MIN_ARRIVAL_GAP_STEPS) {
+      return null; // too close, skip this spawn
+    }
+  }
+
+  return {
+    id: nextId++,
+    direction,
+    step: 0,
+    caught: false,
+  };
 }
 
-/** Check if an object has been missed */
-export function isMissed(obj: FallingObject): boolean {
-  return obj.progress >= MISS_THRESHOLD;
+/** Force-spawn (used when we must spawn) */
+export function spawnObject(): FallingObject {
+  return {
+    id: nextId++,
+    direction: DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)],
+    step: 0,
+    caught: false,
+  };
 }
