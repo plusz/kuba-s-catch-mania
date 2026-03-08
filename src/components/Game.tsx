@@ -8,12 +8,15 @@ import {
   CATCH_STEP,
 } from '@/lib/gameEngine';
 import { useGameControls } from '@/lib/controls';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { playCatchSound, playMissSound, playStepSound } from '@/lib/audio';
+import { trackGameOver } from '@/lib/analytics';
 import CharacterSprite from './CharacterSprite';
 import FallingItem from './FallingItem';
 import GameHud from './GameHud';
 import GameOverModal from './GameOverModal';
 import gameBackground from '@/assets/game_background.png';
+import mobileBackground from '@/assets/mobile_background.png';
 
 interface GameProps {
   character: GameCharacter;
@@ -36,6 +39,7 @@ const STORAGE_KEY = 'catch-game-best-score';
  *    time to react between catches.
  */
 const Game = ({ character, onMenu }: GameProps) => {
+  const isMobile = useIsMobile();
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [currentPose, setCurrentPose] = useState<Direction | null>(null);
@@ -144,6 +148,7 @@ const Game = ({ character, onMenu }: GameProps) => {
         setShaking(true);
         setTimeout(() => setShaking(false), 300);
         setGameOver(true);
+        trackGameOver(scoreRef.current, getLevel(scoreRef.current));
         return updated;
       }
 
@@ -229,7 +234,7 @@ const Game = ({ character, onMenu }: GameProps) => {
     <div
       className={`relative w-full h-screen overflow-hidden ${shaking ? 'animate-shake' : ''}`}
       style={{
-        backgroundImage: `url(${gameBackground})`,
+        backgroundImage: `url(${isMobile ? mobileBackground : gameBackground})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -238,7 +243,7 @@ const Game = ({ character, onMenu }: GameProps) => {
 
       <GameHud score={score} level={level} currentPose={currentPose} />
 
-      <div className="absolute z-10" style={{ left: '50%', top: '65%', transform: 'translate(-50%, -50%)' }}>
+      <div className="absolute z-10" style={{ left: '50%', top: isMobile ? '70%' : '65%', transform: 'translate(-50%, -50%)' }}>
         <CharacterSprite character={character} pose={currentPose} />
       </div>
 
