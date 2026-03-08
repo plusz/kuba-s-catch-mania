@@ -1,12 +1,12 @@
 /** Direction a steak/object can fall from */
 export type Direction = 'top-left' | 'bottom-left' | 'top-right' | 'bottom-right';
 
-/** A falling object in the game */
+/** A falling object in the game (discrete steps) */
 export interface FallingObject {
   id: number;
   direction: Direction;
-  /** Progress from 0 (spawn) to 1 (reached catch point) */
-  progress: number;
+  /** Current step: 0 = just spawned, CATCH_STEP = at catch zone */
+  step: number;
   caught: boolean;
 }
 

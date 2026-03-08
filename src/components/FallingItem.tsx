@@ -1,4 +1,5 @@
 import type { Direction, FallingObject } from '@/lib/gameTypes';
+import { TOTAL_STEPS } from '@/lib/gameEngine';
 
 interface FallingItemProps {
   object: FallingObject;
@@ -6,14 +7,13 @@ interface FallingItemProps {
 }
 
 /**
- * Renders a falling object (steak/cheese) traveling along a lane
+ * Renders a falling object traveling in discrete steps along a lane
  * from a corner toward the center of the screen.
  */
 const FallingItem = ({ object, emoji }: FallingItemProps) => {
-  const { direction, progress } = object;
+  const { direction, step } = object;
+  const progress = step / TOTAL_STEPS;
 
-  // Define start and end positions (percentages) for each lane
-  // Start = corner, End = center (where character is)
   const lanes: Record<Direction, { startX: number; startY: number; endX: number; endY: number }> = {
     'top-left': { startX: 5, startY: 10, endX: 42, endY: 40 },
     'top-right': { startX: 90, startY: 10, endX: 55, endY: 40 },
@@ -24,13 +24,11 @@ const FallingItem = ({ object, emoji }: FallingItemProps) => {
   const lane = lanes[direction];
   const x = lane.startX + (lane.endX - lane.startX) * progress;
   const y = lane.startY + (lane.endY - lane.startY) * progress;
-
-  // Scale up as it gets closer
   const scale = 0.6 + progress * 0.6;
 
   return (
     <div
-      className="absolute pointer-events-none transition-none"
+      className="absolute pointer-events-none"
       style={{
         left: `${x}%`,
         top: `${y}%`,

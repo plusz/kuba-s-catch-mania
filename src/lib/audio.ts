@@ -1,6 +1,6 @@
 /**
- * Simple Web Audio API sound effects for the game.
- * No external files needed — generates tones programmatically.
+ * Web Audio API sound effects.
+ * Generates tones programmatically — no external files needed.
  */
 
 let audioCtx: AudioContext | null = null;
@@ -10,6 +10,23 @@ function getCtx(): AudioContext {
     audioCtx = new AudioContext();
   }
   return audioCtx;
+}
+
+/** Short "tick" sound for each step of a falling object */
+export function playStepSound() {
+  try {
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, ctx.currentTime);
+    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.04);
+  } catch {}
 }
 
 /** Play a short "catch" blip — ascending tone */
