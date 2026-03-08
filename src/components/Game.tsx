@@ -39,6 +39,7 @@ const STORAGE_KEY = 'catch-game-best-score';
  *    time to react between catches.
  */
 const Game = ({ character, onMenu }: GameProps) => {
+  const isMobile = useIsMobile();
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [currentPose, setCurrentPose] = useState<Direction | null>(null);
