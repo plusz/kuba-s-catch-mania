@@ -200,12 +200,6 @@ const Game = ({ character, onMenu }: GameProps) => {
         <FallingItem key={obj.id} object={obj} emoji={objectEmoji} />
       ))}
 
-      <svg className="absolute inset-0 w-full h-full pointer-events-none z-5 opacity-20">
-        <line x1="5%" y1="10%" x2="50%" y2="50%" stroke="hsl(45, 100%, 50%)" strokeWidth="2" strokeDasharray="8,8" />
-        <line x1="95%" y1="10%" x2="50%" y2="50%" stroke="hsl(45, 100%, 50%)" strokeWidth="2" strokeDasharray="8,8" />
-        <line x1="5%" y1="90%" x2="50%" y2="50%" stroke="hsl(45, 100%, 50%)" strokeWidth="2" strokeDasharray="8,8" />
-        <line x1="95%" y1="90%" x2="50%" y2="50%" stroke="hsl(45, 100%, 50%)" strokeWidth="2" strokeDasharray="8,8" />
-      </svg>
 
       {gameOver && (
         <GameOverModal
