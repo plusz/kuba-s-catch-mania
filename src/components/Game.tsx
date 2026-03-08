@@ -11,6 +11,7 @@ import { useGameControls } from '@/lib/controls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { playCatchSound, playMissSound, playStepSound } from '@/lib/audio';
 import { trackGameOver } from '@/lib/analytics';
+import { useBackgroundMusic } from '@/hooks/useBackgroundMusic';
 import CharacterSprite from './CharacterSprite';
 import FallingItem from './FallingItem';
 import GameHud from './GameHud';
