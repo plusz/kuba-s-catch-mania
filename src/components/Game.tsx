@@ -6,7 +6,6 @@ import {
   getLevel,
   resetIdCounter,
   CATCH_STEP,
-  TOTAL_STEPS,
 } from '@/lib/gameEngine';
 import { useGameControls } from '@/lib/controls';
 import { playCatchSound, playMissSound, playStepSound } from '@/lib/audio';
