@@ -27,6 +27,7 @@ const CharacterSprite = ({ character, pose }: CharacterSpriteProps) => {
         backgroundSize: '200% 200%',
         backgroundPosition: `${bgX} ${bgY}`,
         backgroundRepeat: 'no-repeat',
+        mixBlendMode: 'multiply',
       }}
     />
   );
