@@ -75,7 +75,7 @@ const Game = ({ character, onMenu }: GameProps) => {
 
     const currentObjects = objectsRef.current;
     const catchable = currentObjects.find(
-      (obj) => !obj.caught && obj.direction === dir && obj.step === CATCH_STEP
+      (obj) => !obj.caught && obj.direction === dir && obj.step >= CATCH_STEP - 1
     );
 
     if (catchable) {
