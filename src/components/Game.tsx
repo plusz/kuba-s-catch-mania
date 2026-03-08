@@ -21,6 +21,7 @@ import mobileBackground from '@/assets/mobile_background.png';
 interface GameProps {
   character: GameCharacter;
   onMenu: () => void;
+  onNewGame: () => void;
 }
 
 const STORAGE_KEY = 'catch-game-best-score';
@@ -38,7 +39,7 @@ const STORAGE_KEY = 'catch-game-best-score';
  *    to another object (MIN_ARRIVAL_GAP_STEPS=3), so the player always has
  *    time to react between catches.
  */
-const Game = ({ character, onMenu }: GameProps) => {
+const Game = ({ character, onMenu, onNewGame }: GameProps) => {
   const isMobile = useIsMobile();
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
@@ -268,7 +269,7 @@ const Game = ({ character, onMenu }: GameProps) => {
         <GameOverModal
           score={score}
           bestScore={bestScore}
-          onPlayAgain={handlePlayAgain}
+          onPlayAgain={onNewGame}
           onMenu={onMenu}
         />
       )}
