@@ -29,6 +29,7 @@ const Index = () => {
 
   const handleStart = () => {
     ensureSession();
+    // First start doesn't need time check
     setPhase('playing');
   };
 
