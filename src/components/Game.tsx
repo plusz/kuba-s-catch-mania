@@ -21,6 +21,7 @@ import mobileBackground from '@/assets/mobile_background.png';
 interface GameProps {
   character: GameCharacter;
   onMenu: () => void;
+  onNewGame: () => void;
 }
 
 const STORAGE_KEY = 'catch-game-best-score';
