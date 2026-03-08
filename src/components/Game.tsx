@@ -103,23 +103,38 @@ const Game = ({ character, onMenu }: GameProps) => {
 
   useGameControls(handleDirection, !gameOver);
 
-  /** One game tick: advance all objects by 1 step, check misses, maybe spawn */
+  /** One game tick: advance all objects by 1 step, auto-catch by current pose, check misses, maybe spawn */
   const doTick = useCallback(() => {
     if (gameOverRef.current) return;
 
     let missed = false;
+    let caughtByPoseCount = 0;
     let updatedSnapshot: FallingObject[] = [];
 
     setObjects((prev) => {
-      const updated = prev.map((obj) => {
-        if (obj.caught) return obj;
-        const newStep = obj.step + 1;
-        if (newStep > CATCH_STEP) {
-          missed = true;
-          return { ...obj, step: CATCH_STEP };
-        }
-        return { ...obj, step: newStep };
-      }).filter((obj) => !obj.caught);
+      const updated = prev
+        .map((obj) => {
+          if (obj.caught) return obj;
+
+          const poseCatch =
+            !!poseRef.current &&
+            obj.direction === poseRef.current &&
+            obj.step >= CATCH_STEP - 1;
+
+          if (poseCatch) {
+            caughtByPoseCount++;
+            return null;
+          }
+
+          const newStep = obj.step + 1;
+          if (newStep > CATCH_STEP) {
+            missed = true;
+            return { ...obj, step: CATCH_STEP };
+          }
+
+          return { ...obj, step: newStep };
+        })
+        .filter((obj): obj is FallingObject => obj !== null && !obj.caught);
 
       updatedSnapshot = updated;
       objectsRef.current = updated;
@@ -134,6 +149,12 @@ const Game = ({ character, onMenu }: GameProps) => {
 
       return updated;
     });
+
+    if (caughtByPoseCount > 0) {
+      playCatchSound();
+      setScore((prev) => prev + caughtByPoseCount);
+      appendDebug(`AUTO-CAUGHT count=${caughtByPoseCount} pose=${poseRef.current}`);
+    }
 
     appendDebug(
       `TICK pose=${poseRef.current ?? 'none'} objs=${updatedSnapshot
