@@ -11,7 +11,7 @@ interface GameHudProps {
 }
 
 /** Heads-up display showing score, level, and key hints */
-const GameHud = ({ score, level, currentPose }: GameHudProps) => {
+const GameHud = ({ score, level, currentPose, musicEnabled, onToggleMusic }: GameHudProps) => {
   const directions: Direction[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 
   return (
