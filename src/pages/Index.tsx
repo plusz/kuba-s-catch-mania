@@ -92,7 +92,7 @@ const Index = () => {
   }
 
   if (phase === 'playing' && character) {
-    return <Game character={character} onMenu={handleBackToSelect} onNewGame={handleNewGame} />;
+    return <Game key={gameKey} character={character} onMenu={handleBackToSelect} onNewGame={handleNewGame} />;
   }
 
   return null;
