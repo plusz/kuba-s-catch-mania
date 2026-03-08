@@ -47,6 +47,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        game: {
+          sand: "hsl(var(--game-sand))",
+          jungle: "hsl(var(--game-jungle))",
+          sky: "hsl(var(--game-sky))",
+          gold: "hsl(var(--game-gold))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
