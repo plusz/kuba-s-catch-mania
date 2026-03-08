@@ -25,7 +25,7 @@ const MOBILE_LANES: Record<Direction, { startX: number; startY: number; endX: nu
   'bottom-right': { startX: 90, startY: 82, endX: 62, endY: 62 },
 };
 
-const FallingItem = ({ object, emoji, objectImage }: FallingItemProps) => {
+const FallingItem = ({ object, emoji, objectImage, characterId }: FallingItemProps) => {
   const isMobile = useIsMobile();
   const { direction, step } = object;
   const progress = Math.min(step, CATCH_STEP) / CATCH_STEP;
