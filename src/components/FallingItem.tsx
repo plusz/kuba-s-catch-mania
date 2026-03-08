@@ -5,6 +5,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 interface FallingItemProps {
   object: FallingObject;
   emoji: string;
+  /** Optional image to render instead of emoji */
+  objectImage?: string;
 }
 
 const DESKTOP_LANES: Record<Direction, { startX: number; startY: number; endX: number; endY: number }> = {
@@ -21,7 +23,7 @@ const MOBILE_LANES: Record<Direction, { startX: number; startY: number; endX: nu
   'bottom-right': { startX: 90, startY: 82, endX: 62, endY: 62 },
 };
 
-const FallingItem = ({ object, emoji }: FallingItemProps) => {
+const FallingItem = ({ object, emoji, objectImage }: FallingItemProps) => {
   const isMobile = useIsMobile();
   const { direction, step } = object;
   const progress = Math.min(step, CATCH_STEP) / CATCH_STEP;
@@ -39,11 +41,19 @@ const FallingItem = ({ object, emoji }: FallingItemProps) => {
         left: `${x}%`,
         top: `${y}%`,
         transform: `translate(-50%, -50%) scale(${scale})`,
-        fontSize: '2rem',
         zIndex: 20,
       }}
     >
-      <span className="drop-shadow-lg">{emoji}</span>
+      {objectImage ? (
+        <img
+          src={objectImage}
+          alt=""
+          className="drop-shadow-lg"
+          style={{ width: '2rem', height: '2rem', objectFit: 'contain' }}
+        />
+      ) : (
+        <span className="drop-shadow-lg" style={{ fontSize: '2rem' }}>{emoji}</span>
+      )}
     </div>
   );
 };
