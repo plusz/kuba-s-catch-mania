@@ -226,7 +226,7 @@ const Game = ({ character, onMenu }: GameProps) => {
     ticksSinceSpawnRef.current = 10;
   };
 
-  const objectEmoji = character.id === 'lion' ? '🥩' : '🧀';
+  const objectEmoji = character.objectEmoji;
 
   return (
     <div
