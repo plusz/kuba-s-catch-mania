@@ -15,10 +15,10 @@ const DESKTOP_LANES: Record<Direction, { startX: number; startY: number; endX: n
 };
 
 const MOBILE_LANES: Record<Direction, { startX: number; startY: number; endX: number; endY: number }> = {
-  'top-left': { startX: 5, startY: 25, endX: 35, endY: 55 },
-  'top-right': { startX: 95, startY: 25, endX: 65, endY: 55 },
-  'bottom-left': { startX: 5, startY: 90, endX: 35, endY: 68 },
-  'bottom-right': { startX: 95, startY: 90, endX: 65, endY: 68 },
+  'top-left': { startX: 10, startY: 30, endX: 38, endY: 52 },
+  'top-right': { startX: 90, startY: 30, endX: 62, endY: 52 },
+  'bottom-left': { startX: 10, startY: 82, endX: 38, endY: 62 },
+  'bottom-right': { startX: 90, startY: 82, endX: 62, endY: 62 },
 };
 
 const FallingItem = ({ object, emoji }: FallingItemProps) => {
