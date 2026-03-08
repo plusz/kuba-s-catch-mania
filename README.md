@@ -1,73 +1,64 @@
-# Welcome to your Lovable project
+# 🎮 Catch Game — Zwierzęta Detektywi
 
-## Project info
+A fun arcade-style catching game where animal detective characters catch falling treats! Built with React, TypeScript, Vite, and Tailwind CSS.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🐾 Characters
 
-## How can I edit this code?
+- **Lion Kuba** — catches steaks 🥩
+- **Mouse Patricia** — catches cheese 🧀
+- **Anteater Alfred** — catches ant cookies 🍪 *(secret character)*
+- **Giraffe Sophia** — catches palm leaves 🌿 *(secret character)*
 
-There are several ways of editing your application.
+## 🎮 How to Play
 
-**Use Lovable**
+Use keyboard keys to catch falling items from 4 directions:
+- **A** — Top Left
+- **L** — Top Right
+- **Z** — Bottom Left
+- **M** — Bottom Right
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Miss one item and it's game over! Speed increases with each level.
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠 Tech Stack
 
-**Use your preferred IDE**
+- [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## 🚀 Getting Started
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repo
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📦 Deployment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Vercel
 
-**Use GitHub Codespaces**
+This project is ready for Vercel deployment out of the box (Vite SPA).
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Push to GitHub
+2. Import the repo in [Vercel](https://vercel.com/new)
+3. Framework preset: **Vite**
+4. Build command: `npm run build`
+5. Output directory: `dist`
+6. Deploy!
 
-## What technologies are used for this project?
+For client-side routing, a `vercel.json` is included to handle SPA rewrites.
 
-This project is built with:
+### Lovable
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Open [Lovable](https://lovable.dev) and click Share → Publish.
 
-## How can I deploy this project?
+## 📄 License
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+© 2026 [www.ZwierzetaDetektywi.pl](https://www.ZwierzetaDetektywi.pl)
