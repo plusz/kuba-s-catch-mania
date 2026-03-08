@@ -108,6 +108,7 @@ const Game = ({ character, onMenu }: GameProps) => {
     if (gameOverRef.current) return;
 
     let missed = false;
+    let updatedSnapshot: FallingObject[] = [];
 
     setObjects((prev) => {
       const updated = prev.map((obj) => {
@@ -120,6 +121,7 @@ const Game = ({ character, onMenu }: GameProps) => {
         return { ...obj, step: newStep };
       }).filter((obj) => !obj.caught);
 
+      updatedSnapshot = updated;
       objectsRef.current = updated;
 
       if (missed) {
@@ -133,7 +135,16 @@ const Game = ({ character, onMenu }: GameProps) => {
       return updated;
     });
 
-    if (missed) return;
+    appendDebug(
+      `TICK pose=${poseRef.current ?? 'none'} objs=${updatedSnapshot
+        .map((o) => `${o.direction}@${o.step}${o.direction === poseRef.current && o.step >= CATCH_STEP - 1 ? '[match]' : ''}`)
+        .join(',') || 'none'}`
+    );
+
+    if (missed) {
+      appendDebug('MISS -> game over');
+      return;
+    }
 
     // Play step sound for each tick (audible rhythm)
     playStepSound();
@@ -145,9 +156,10 @@ const Game = ({ character, onMenu }: GameProps) => {
       if (newObj) {
         setObjects((prev) => [...prev, newObj]);
         ticksSinceSpawnRef.current = 0;
+        appendDebug(`SPAWN ${newObj.direction}@${newObj.step}`);
       }
     }
-  }, []);
+  }, [appendDebug]);
 
   /** Start or restart the tick interval */
   const startTickLoop = useCallback(() => {
