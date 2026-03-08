@@ -69,6 +69,10 @@ const Game = ({ character, onMenu }: GameProps) => {
     }
   }, [gameOver, score, bestScore]);
 
+  const appendDebug = useCallback((line: string) => {
+    setDebugLines((prev) => [...prev.slice(-10), line]);
+  }, []);
+
   // Handle direction input — check for catchable objects at CATCH_STEP
   const handleDirection = useCallback((dir: Direction) => {
     if (gameOverRef.current) return;
