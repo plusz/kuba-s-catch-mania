@@ -1,3 +1,4 @@
+import { Volume2, VolumeX } from 'lucide-react';
 import { DIRECTION_KEYS } from '@/lib/gameTypes';
 import type { Direction } from '@/lib/gameTypes';
 
@@ -5,6 +6,8 @@ interface GameHudProps {
   score: number;
   level: number;
   currentPose: Direction | null;
+  musicEnabled: boolean;
+  onToggleMusic: () => void;
 }
 
 /** Heads-up display showing score, level, and key hints */
