@@ -21,7 +21,7 @@ const CharacterSprite = ({ character, pose }: CharacterSpriteProps) => {
 
   return (
     <div
-      className="w-32 h-32 md:w-44 md:h-44 rounded-xl overflow-hidden"
+      className="w-28 h-40 md:w-40 md:h-56 rounded-xl overflow-hidden"
       style={{
         backgroundImage: `url(${character.spriteImage})`,
         backgroundSize: '200% 200%',
