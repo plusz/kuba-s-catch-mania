@@ -6,7 +6,6 @@ import {
   getLevel,
   resetIdCounter,
   CATCH_STEP,
-  TOTAL_STEPS,
 } from '@/lib/gameEngine';
 import { useGameControls } from '@/lib/controls';
 import { playCatchSound, playMissSound, playStepSound } from '@/lib/audio';
@@ -26,14 +25,12 @@ const STORAGE_KEY = 'catch-game-best-score';
 /**
  * HOW CATCHING WORKS (discrete step system):
  * 
- * 1. Objects move in discrete steps (0 to TOTAL_STEPS=8), one step per "tick".
+ * 1. Objects move in discrete steps (0 to 7), one step per "tick".
  * 2. Tick interval starts at 1000ms (1/sec) and speeds up to 100ms (10/sec).
- * 3. When an object reaches step CATCH_STEP (7), it's in the "catch zone".
+ * 3. When an object reaches step CATCH_STEP (7), it's at ramp end (catch zone).
  * 4. The player must press the matching direction key (A/Z/L/M) while the
- *    object is at step 7. The key press instantly checks all objects at step 7
- *    with that direction and catches the first match.
- * 5. If an object at step 7 is NOT caught by the next tick, it advances past
- *    TOTAL_STEPS → game over (missed).
+ *    object is at step 7. The key press checks objects at step 7 for that direction.
+ * 5. If an object at step 7 is NOT caught by the next tick, it misses and game ends.
  * 6. Objects are never spawned if they'd arrive at the catch zone too close
  *    to another object (MIN_ARRIVAL_GAP_STEPS=3), so the player always has
  *    time to react between catches.
@@ -78,12 +75,16 @@ const Game = ({ character, onMenu }: GameProps) => {
 
     const currentObjects = objectsRef.current;
     const catchable = currentObjects.find(
-      (obj) => !obj.caught && obj.direction === dir && obj.step >= CATCH_STEP
+      (obj) => !obj.caught && obj.direction === dir && obj.step === CATCH_STEP
     );
 
     if (catchable) {
       playCatchSound();
-      setObjects((prev) => prev.filter((o) => o.id !== catchable.id));
+      setObjects((prev) => {
+        const updated = prev.filter((o) => o.id !== catchable.id);
+        objectsRef.current = updated;
+        return updated;
+      });
       setScore((prev) => prev + 1);
     }
   }, []);
@@ -100,11 +101,14 @@ const Game = ({ character, onMenu }: GameProps) => {
       const updated = prev.map((obj) => {
         if (obj.caught) return obj;
         const newStep = obj.step + 1;
-        if (newStep > TOTAL_STEPS) {
+        if (newStep > CATCH_STEP) {
           missed = true;
+          return { ...obj, step: CATCH_STEP };
         }
         return { ...obj, step: newStep };
       }).filter((obj) => !obj.caught);
+
+      objectsRef.current = updated;
 
       if (missed) {
         playMissSound();
@@ -188,7 +192,7 @@ const Game = ({ character, onMenu }: GameProps) => {
 
       <GameHud score={score} level={level} currentPose={currentPose} />
 
-      <div className="absolute inset-0 flex items-center justify-center z-10">
+      <div className="absolute inset-0 flex items-center justify-center z-10 translate-y-4 md:translate-y-6">
         <CharacterSprite character={character} pose={currentPose} />
       </div>
 

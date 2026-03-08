@@ -1,5 +1,5 @@
 import type { Direction, FallingObject } from '@/lib/gameTypes';
-import { TOTAL_STEPS } from '@/lib/gameEngine';
+import { CATCH_STEP } from '@/lib/gameEngine';
 
 interface FallingItemProps {
   object: FallingObject;
@@ -12,7 +12,7 @@ interface FallingItemProps {
  */
 const FallingItem = ({ object, emoji }: FallingItemProps) => {
   const { direction, step } = object;
-  const progress = step / TOTAL_STEPS;
+  const progress = Math.min(step, CATCH_STEP) / CATCH_STEP;
 
   const lanes: Record<Direction, { startX: number; startY: number; endX: number; endY: number }> = {
     'top-left': { startX: 5, startY: 10, endX: 42, endY: 40 },
