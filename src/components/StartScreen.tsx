@@ -10,15 +10,15 @@ interface StartScreenProps {
 /** Start screen with instructions */
 const StartScreen = ({ character, onStart, onBack }: StartScreenProps) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1 className="font-arcade text-xl md:text-3xl text-secondary mb-2 text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
+      <h1 className="font-arcade text-lg md:text-3xl text-secondary mb-1 sm:mb-2 text-center">
         {character.displayName}
       </h1>
-      <p className="font-arcade text-xs text-primary mb-8">
+      <p className="font-arcade text-[10px] sm:text-xs text-primary mb-4 sm:mb-8">
         Catch the {character.objectName}!
       </p>
 
-      <div className="w-32 h-32 rounded-xl overflow-hidden mb-8 animate-pulse-glow">
+      <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-xl overflow-hidden mb-4 sm:mb-8 animate-pulse-glow">
         <img
           src={character.spriteImage}
           alt={character.displayName}
