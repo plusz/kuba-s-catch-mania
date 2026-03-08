@@ -16,10 +16,12 @@ const CharacterSprite = ({ character, pose }: CharacterSpriteProps) => {
   const bgX = pos.col === 0 ? '0%' : '100%';
   const bgY = pos.row === 0 ? '0%' : '100%';
 
-  const isGiraffe = character.id === 'giraffe';
-  const sizeClass = isGiraffe
-    ? 'w-[134px] h-[192px] md:w-48 md:h-[268px]'
-    : 'w-28 h-40 md:w-40 md:h-56';
+  const sizeMap: Record<string, string> = {
+    giraffe: 'w-[174px] h-[250px] md:w-[250px] md:h-[348px]',
+    anteater: 'w-[160px] h-[190px] md:w-[228px] md:h-[270px]',
+    default: 'w-[146px] h-[208px] md:w-[208px] md:h-[291px]',
+  };
+  const sizeClass = sizeMap[character.id] || sizeMap.default;
 
   return (
     <div
