@@ -112,10 +112,9 @@ const Game = ({ character, onMenu }: GameProps) => {
     if (gameOverRef.current) return;
 
     let missed = false;
-    let caughtByPoseCount = 0;
-    let updatedSnapshot: FallingObject[] = [];
 
     setObjects((prev) => {
+      let caughtCount = 0;
       const updated = prev
         .map((obj) => {
           if (obj.caught) return obj;
@@ -126,7 +125,7 @@ const Game = ({ character, onMenu }: GameProps) => {
             obj.step >= CATCH_STEP - 1;
 
           if (poseCatch) {
-            caughtByPoseCount++;
+            caughtCount++;
             return null;
           }
 
@@ -140,7 +139,6 @@ const Game = ({ character, onMenu }: GameProps) => {
         })
         .filter((obj): obj is FallingObject => obj !== null && !obj.caught);
 
-      updatedSnapshot = updated;
       objectsRef.current = updated;
 
       if (missed) {
@@ -152,17 +150,17 @@ const Game = ({ character, onMenu }: GameProps) => {
         return updated;
       }
 
+      if (caughtCount > 0) {
+        playCatchSound();
+        setScore((s) => s + caughtCount);
+        appendDebug(`AUTO-CAUGHT count=${caughtCount} pose=${poseRef.current}`);
+      }
+
       return updated;
     });
 
-    if (caughtByPoseCount > 0) {
-      playCatchSound();
-      setScore((prev) => prev + caughtByPoseCount);
-      appendDebug(`AUTO-CAUGHT count=${caughtByPoseCount} pose=${poseRef.current}`);
-    }
-
     appendDebug(
-      `TICK pose=${poseRef.current ?? 'none'} objs=${updatedSnapshot
+      `TICK pose=${poseRef.current ?? 'none'} objs=${objectsRef.current
         .map((o) => `${o.direction}@${o.step}${o.direction === poseRef.current && o.step >= CATCH_STEP - 1 ? '[match]' : ''}`)
         .join(',') || 'none'}`
     );
