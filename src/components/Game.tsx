@@ -224,7 +224,19 @@ const Game = ({ character, onMenu }: GameProps) => {
         <FallingItem key={obj.id} object={obj} emoji={objectEmoji} />
       ))}
 
-
+      <div className="absolute left-2 bottom-2 z-30 max-w-[92vw] rounded-md border border-border bg-card/85 p-2 text-xs text-card-foreground">
+        <div className="font-semibold">DEBUG CATCH</div>
+        <div>pose: {currentPose ?? 'none'} | catchWindow: step ≥ {CATCH_STEP - 1}</div>
+        {debugLines.length === 0 ? (
+          <div>brak logów…</div>
+        ) : (
+          <div className="mt-1 max-h-36 overflow-auto space-y-0.5">
+            {debugLines.map((line, idx) => (
+              <div key={`${idx}-${line}`}>{line}</div>
+            ))}
+          </div>
+        )}
+      </div>
       {gameOver && (
         <GameOverModal
           score={score}
