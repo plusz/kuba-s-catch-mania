@@ -1,5 +1,5 @@
 import type { Direction, FallingObject } from '@/lib/gameTypes';
-import { TOTAL_STEPS } from '@/lib/gameEngine';
+import { CATCH_STEP } from '@/lib/gameEngine';
 
 interface FallingItemProps {
   object: FallingObject;
