@@ -218,6 +218,7 @@ const Game = ({ character, onMenu }: GameProps) => {
     setObjects([]);
     setCurrentPose(null);
     setGameOver(false);
+    setDebugLines([]);
     gameOverRef.current = false;
     ticksSinceSpawnRef.current = 10;
   };
