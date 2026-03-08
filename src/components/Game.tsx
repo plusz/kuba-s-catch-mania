@@ -8,12 +8,15 @@ import {
   CATCH_STEP,
 } from '@/lib/gameEngine';
 import { useGameControls } from '@/lib/controls';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { playCatchSound, playMissSound, playStepSound } from '@/lib/audio';
+import { trackGameOver } from '@/lib/analytics';
 import CharacterSprite from './CharacterSprite';
 import FallingItem from './FallingItem';
 import GameHud from './GameHud';
 import GameOverModal from './GameOverModal';
 import gameBackground from '@/assets/game_background.png';
+import mobileBackground from '@/assets/mobile_background.png';
 
 interface GameProps {
   character: GameCharacter;
