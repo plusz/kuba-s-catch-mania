@@ -249,7 +249,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
       </div>
 
       {objects.map((obj) => (
-        <FallingItem key={obj.id} object={obj} emoji={objectEmoji} objectImage={character.objectImage} />
+        <FallingItem key={obj.id} object={obj} emoji={objectEmoji} objectImage={character.objectImage} characterId={character.id} />
       ))}
 
       {new URLSearchParams(window.location.search).has('debug') && (

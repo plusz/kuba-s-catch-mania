@@ -7,6 +7,8 @@ interface FallingItemProps {
   emoji: string;
   /** Optional image to render instead of emoji */
   objectImage?: string;
+  /** Character ID for per-character sizing */
+  characterId?: string;
 }
 
 const DESKTOP_LANES: Record<Direction, { startX: number; startY: number; endX: number; endY: number }> = {
@@ -23,7 +25,7 @@ const MOBILE_LANES: Record<Direction, { startX: number; startY: number; endX: nu
   'bottom-right': { startX: 90, startY: 82, endX: 62, endY: 62 },
 };
 
-const FallingItem = ({ object, emoji, objectImage }: FallingItemProps) => {
+const FallingItem = ({ object, emoji, objectImage, characterId }: FallingItemProps) => {
   const isMobile = useIsMobile();
   const { direction, step } = object;
   const progress = Math.min(step, CATCH_STEP) / CATCH_STEP;
@@ -49,7 +51,7 @@ const FallingItem = ({ object, emoji, objectImage }: FallingItemProps) => {
           src={objectImage}
           alt=""
           className="drop-shadow-lg"
-          style={{ width: '2rem', height: '2rem', objectFit: 'contain' }}
+          style={{ width: characterId === 'giraffe' ? '2.6rem' : '2rem', height: characterId === 'giraffe' ? '2.6rem' : '2rem', objectFit: 'contain' }}
         />
       ) : (
         <span className="drop-shadow-lg" style={{ fontSize: '2rem' }}>{emoji}</span>
