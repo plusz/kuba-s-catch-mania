@@ -62,6 +62,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
   useEffect(() => { gameOverRef.current = gameOver; }, [gameOver]);
 
   const level = getLevel(score);
+  const { musicEnabled, toggleMusic } = useBackgroundMusic(!gameOver);
 
   const [bestScore, setBestScore] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
