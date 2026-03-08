@@ -41,6 +41,7 @@ const Game = ({ character, onMenu }: GameProps) => {
   const [currentPose, setCurrentPose] = useState<Direction | null>(null);
   const [objects, setObjects] = useState<FallingObject[]>([]);
   const [shaking, setShaking] = useState(false);
+  const [debugLines, setDebugLines] = useState<string[]>([]);
 
   const scoreRef = useRef(0);
   const objectsRef = useRef<FallingObject[]>([]);
