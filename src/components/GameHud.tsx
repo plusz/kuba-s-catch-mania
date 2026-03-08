@@ -1,3 +1,4 @@
+import { Volume2, VolumeX } from 'lucide-react';
 import { DIRECTION_KEYS } from '@/lib/gameTypes';
 import type { Direction } from '@/lib/gameTypes';
 
@@ -5,10 +6,12 @@ interface GameHudProps {
   score: number;
   level: number;
   currentPose: Direction | null;
+  musicEnabled: boolean;
+  onToggleMusic: () => void;
 }
 
 /** Heads-up display showing score, level, and key hints */
-const GameHud = ({ score, level, currentPose }: GameHudProps) => {
+const GameHud = ({ score, level, currentPose, musicEnabled, onToggleMusic }: GameHudProps) => {
   const directions: Direction[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 
   return (
@@ -19,9 +22,18 @@ const GameHud = ({ score, level, currentPose }: GameHudProps) => {
           <p className="font-arcade text-xs text-muted-foreground">Score</p>
           <p className="font-arcade text-lg text-secondary">{score}</p>
         </div>
-        <div className="bg-card/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-border">
-          <p className="font-arcade text-xs text-muted-foreground">Level</p>
-          <p className="font-arcade text-lg text-primary">{level}</p>
+        <div className="flex items-start gap-2">
+          <button
+            onClick={onToggleMusic}
+            className="bg-card/80 backdrop-blur-sm rounded-lg px-3 py-3 border border-border text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={musicEnabled ? 'Mute music' : 'Unmute music'}
+          >
+            {musicEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          </button>
+          <div className="bg-card/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-border">
+            <p className="font-arcade text-xs text-muted-foreground">Level</p>
+            <p className="font-arcade text-lg text-primary">{level}</p>
+          </div>
         </div>
       </div>
 

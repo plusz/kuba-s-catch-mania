@@ -11,6 +11,7 @@ import { useGameControls } from '@/lib/controls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { playCatchSound, playMissSound, playStepSound } from '@/lib/audio';
 import { trackGameOver } from '@/lib/analytics';
+import { useBackgroundMusic } from '@/hooks/useBackgroundMusic';
 import CharacterSprite from './CharacterSprite';
 import FallingItem from './FallingItem';
 import GameHud from './GameHud';
@@ -61,6 +62,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
   useEffect(() => { gameOverRef.current = gameOver; }, [gameOver]);
 
   const level = getLevel(score);
+  const { musicEnabled, toggleMusic } = useBackgroundMusic(!gameOver);
 
   const [bestScore, setBestScore] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -240,7 +242,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
     >
       
 
-      <GameHud score={score} level={level} currentPose={currentPose} />
+      <GameHud score={score} level={level} currentPose={currentPose} musicEnabled={musicEnabled} onToggleMusic={toggleMusic} />
 
       <div className="absolute z-10" style={{ left: '50%', top: isMobile ? '58%' : '65%', transform: 'translate(-50%, -50%)' }}>
         <CharacterSprite character={character} pose={currentPose} />
