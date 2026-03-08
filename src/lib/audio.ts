@@ -29,7 +29,7 @@ export function playStepSound() {
   } catch {}
 }
 
-/** Play a short "catch" blip — ascending tone */
+/** Play a soft, short, gentle "catch" blip — higher than step sound */
 export function playCatchSound() {
   try {
     const ctx = getCtx();
@@ -37,13 +37,13 @@ export function playCatchSound() {
     const gain = ctx.createGain();
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(600, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
-    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.06);
+    gain.gain.setValueAtTime(0.07, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
     osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.15);
+    osc.stop(ctx.currentTime + 0.08);
   } catch {}
 }
 
