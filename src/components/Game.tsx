@@ -80,7 +80,11 @@ const Game = ({ character, onMenu }: GameProps) => {
 
     if (catchable) {
       playCatchSound();
-      setObjects((prev) => prev.filter((o) => o.id !== catchable.id));
+      setObjects((prev) => {
+        const updated = prev.filter((o) => o.id !== catchable.id);
+        objectsRef.current = updated;
+        return updated;
+      });
       setScore((prev) => prev + 1);
     }
   }, []);
