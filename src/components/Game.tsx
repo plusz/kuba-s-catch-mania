@@ -73,7 +73,7 @@ const Game = ({ character, onMenu }: GameProps) => {
     setDebugLines((prev) => [...prev.slice(-10), line]);
   }, []);
 
-  // Handle direction input — check for catchable objects at CATCH_STEP
+  // Handle direction input — check for catchable objects near ramp end
   const handleDirection = useCallback((dir: Direction) => {
     if (gameOverRef.current) return;
     setCurrentPose(dir);
@@ -81,6 +81,12 @@ const Game = ({ character, onMenu }: GameProps) => {
     const currentObjects = objectsRef.current;
     const catchable = currentObjects.find(
       (obj) => !obj.caught && obj.direction === dir && obj.step >= CATCH_STEP - 1
+    );
+
+    appendDebug(
+      `INPUT dir=${dir} pose=${dir} objs=${currentObjects
+        .map((o) => `${o.direction}@${o.step}`)
+        .join(',') || 'none'} catch=${catchable ? `${catchable.direction}@${catchable.step}` : 'none'}`
     );
 
     if (catchable) {
@@ -91,8 +97,9 @@ const Game = ({ character, onMenu }: GameProps) => {
         return updated;
       });
       setScore((prev) => prev + 1);
+      appendDebug(`CAUGHT dir=${dir} step=${catchable.step}`);
     }
-  }, []);
+  }, [appendDebug]);
 
   useGameControls(handleDirection, !gameOver);
 
