@@ -13,15 +13,17 @@ const CharacterSprite = ({ character, pose }: CharacterSpriteProps) => {
   const currentPose = pose || 'top-left';
   const pos = character.spritePositions[currentPose];
 
-  // background-size: 200% 200% makes the image 2x the container in both axes
-  // background-position picks which quadrant to show:
-  // col 0 → 0%, col 1 → 100%; row 0 → 0%, row 1 → 100%
   const bgX = pos.col === 0 ? '0%' : '100%';
   const bgY = pos.row === 0 ? '0%' : '100%';
 
+  const isGiraffe = character.id === 'giraffe';
+  const sizeClass = isGiraffe
+    ? 'w-[134px] h-[192px] md:w-48 md:h-[268px]'
+    : 'w-28 h-40 md:w-40 md:h-56';
+
   return (
     <div
-      className="w-28 h-40 md:w-40 md:h-56 rounded-xl overflow-hidden"
+      className={`${sizeClass} rounded-xl overflow-hidden`}
       style={{
         backgroundImage: `url(${character.spriteImage})`,
         backgroundSize: '200% 200%',
