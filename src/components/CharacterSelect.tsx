@@ -96,7 +96,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
               Secret Characters
             </h2>
             <p className="text-xs text-muted-foreground text-center">
-              💡 Podpowiedź: podaj imię koguta z bajki o szczęściu
+              💡 Hint: enter the name of the rooster from the tale of happiness
             </p>
             <input
               type="text"
