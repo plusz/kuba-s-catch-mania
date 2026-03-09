@@ -96,7 +96,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
               Secret Characters
             </h2>
             <p className="text-xs text-muted-foreground text-center">
-              💡 Podpowiedź: podaj imię koguta z bajki o szczęściu
+              💡 Hint: enter the name of the rooster from the tale of happiness
             </p>
             <input
               type="text"
@@ -106,25 +106,25 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                 setPasswordError(false);
               }}
               onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
-              placeholder="Wpisz hasło..."
+              placeholder="Enter password..."
               className="w-full px-4 py-2 rounded-lg bg-muted border border-border text-foreground text-center font-arcade text-xs focus:outline-none focus:border-secondary"
               autoFocus
             />
             {passwordError && (
-              <p className="text-xs text-destructive font-arcade">Złe hasło!</p>
+              <p className="text-xs text-destructive font-arcade">Wrong password!</p>
             )}
             <div className="flex gap-3">
               <button
                 onClick={() => { setShowPasswordModal(false); setPasswordInput(''); setPasswordError(false); }}
                 className="font-arcade text-xs px-5 py-2 rounded-lg bg-muted text-muted-foreground hover:bg-border transition-colors"
               >
-                Anuluj
+                Cancel
               </button>
               <button
                 onClick={handleUnlock}
                 className="font-arcade text-xs px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
               >
-                Odblokuj
+                Unlock
               </button>
             </div>
           </div>
