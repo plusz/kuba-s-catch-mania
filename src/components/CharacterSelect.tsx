@@ -124,7 +124,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                 onClick={handleUnlock}
                 className="font-arcade text-xs px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
               >
-                Odblokuj
+                Unlock
               </button>
             </div>
           </div>
