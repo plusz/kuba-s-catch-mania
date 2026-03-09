@@ -111,7 +111,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
               autoFocus
             />
             {passwordError && (
-              <p className="text-xs text-destructive font-arcade">Złe hasło!</p>
+              <p className="text-xs text-destructive font-arcade">Wrong password!</p>
             )}
             <div className="flex gap-3">
               <button
