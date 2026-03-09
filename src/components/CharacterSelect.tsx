@@ -118,7 +118,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                 onClick={() => { setShowPasswordModal(false); setPasswordInput(''); setPasswordError(false); }}
                 className="font-arcade text-xs px-5 py-2 rounded-lg bg-muted text-muted-foreground hover:bg-border transition-colors"
               >
-                Anuluj
+                Cancel
               </button>
               <button
                 onClick={handleUnlock}
