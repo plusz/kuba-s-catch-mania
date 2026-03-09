@@ -106,7 +106,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                 setPasswordError(false);
               }}
               onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
-              placeholder="Wpisz hasło..."
+              placeholder="Enter password..."
               className="w-full px-4 py-2 rounded-lg bg-muted border border-border text-foreground text-center font-arcade text-xs focus:outline-none focus:border-secondary"
               autoFocus
             />
