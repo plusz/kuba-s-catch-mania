@@ -56,7 +56,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                 playClickSound();
                 onSelect(char);
               }}
-              className={`group flex flex-col items-center gap-4 p-6 rounded-xl bg-card border-2 transition-all duration-200 cursor-pointer ${
+              className={`group flex flex-col items-center gap-2 sm:gap-4 p-3 sm:p-6 rounded-xl bg-card border-2 transition-all duration-200 cursor-pointer ${
                 isLocked
                   ? 'border-border opacity-60 hover:opacity-80'
                   : 'border-border hover:border-secondary hover:scale-105 hover:shadow-xl hover:shadow-secondary/20'
