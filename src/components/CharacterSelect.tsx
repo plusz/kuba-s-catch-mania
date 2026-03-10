@@ -41,7 +41,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
         Choose your character
       </p>
 
-      <div className="grid grid-cols-2 gap-8 justify-items-center max-w-lg">
+      <div className="grid grid-cols-2 gap-3 sm:gap-8 justify-items-center max-w-lg">
         {CHARACTERS.map((char) => {
           const isLocked = char.locked && !unlocked;
 
@@ -56,13 +56,13 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                 playClickSound();
                 onSelect(char);
               }}
-              className={`group flex flex-col items-center gap-4 p-6 rounded-xl bg-card border-2 transition-all duration-200 cursor-pointer ${
+              className={`group flex flex-col items-center gap-2 sm:gap-4 p-3 sm:p-6 rounded-xl bg-card border-2 transition-all duration-200 cursor-pointer ${
                 isLocked
                   ? 'border-border opacity-60 hover:opacity-80'
                   : 'border-border hover:border-secondary hover:scale-105 hover:shadow-xl hover:shadow-secondary/20'
               }`}
             >
-              <div className="relative w-40 h-40 rounded-lg overflow-hidden bg-muted">
+              <div className="relative w-28 h-28 sm:w-40 sm:h-40 rounded-lg overflow-hidden bg-muted">
                 <img
                   src={char.spriteImage}
                   alt={char.displayName}
