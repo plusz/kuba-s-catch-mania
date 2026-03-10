@@ -62,7 +62,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                   : 'border-border hover:border-secondary hover:scale-105 hover:shadow-xl hover:shadow-secondary/20'
               }`}
             >
-              <div className="relative w-40 h-40 rounded-lg overflow-hidden bg-muted">
+              <div className="relative w-28 h-28 sm:w-40 sm:h-40 rounded-lg overflow-hidden bg-muted">
                 <img
                   src={char.spriteImage}
                   alt={char.displayName}
