@@ -41,7 +41,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
         Choose your character
       </p>
 
-      <div className="grid grid-cols-2 gap-8 justify-items-center max-w-lg">
+      <div className="grid grid-cols-2 gap-3 sm:gap-8 justify-items-center max-w-lg">
         {CHARACTERS.map((char) => {
           const isLocked = char.locked && !unlocked;
 
