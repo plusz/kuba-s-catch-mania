@@ -38,9 +38,20 @@ const FallingItem = ({ object, emoji, objectImage, objectImageStages, characterI
   const y = lane.startY + (lane.endY - lane.startY) * progress;
   const scale = 1.2 + progress * 1.2;
 
-  const stageImage = objectImageStages && objectImageStages.length > 0
-    ? objectImageStages[Math.min(Math.floor(progress * objectImageStages.length), objectImageStages.length - 1)]
-    : objectImage;
+  // Staged sprites: only switch in the last 2 catch steps (CATCH_STEP-1, CATCH_STEP).
+  // Earlier steps always use the first (intact) sprite.
+  let stageImage = objectImage;
+  if (objectImageStages && objectImageStages.length > 0) {
+    if (step >= CATCH_STEP) {
+      stageImage = objectImageStages[Math.min(2, objectImageStages.length - 1)];
+    } else if (step >= CATCH_STEP - 1) {
+      stageImage = objectImageStages[Math.min(1, objectImageStages.length - 1)];
+    } else {
+      stageImage = objectImageStages[0];
+    }
+  }
+
+  const itemSize = characterId === 'giraffe' || characterId === 'jackal' ? '2.6rem' : '2rem';
 
   return (
     <div
@@ -57,8 +68,9 @@ const FallingItem = ({ object, emoji, objectImage, objectImageStages, characterI
           src={stageImage}
           alt=""
           className="drop-shadow-lg"
-          style={{ width: characterId === 'giraffe' ? '2.6rem' : '2rem', height: characterId === 'giraffe' ? '2.6rem' : '2rem', objectFit: 'contain' }}
+          style={{ width: itemSize, height: itemSize, objectFit: 'contain' }}
         />
+
       ) : (
         <span className="drop-shadow-lg" style={{ fontSize: '2rem' }}>{emoji}</span>
       )}
