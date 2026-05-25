@@ -8,6 +8,8 @@ import jackalBackground from '@/assets/jackal_background.webp';
 import cookieImage from '@/assets/cookie_game.png';
 import palmImage from '@/assets/palm_game.png';
 import moneyBagImage from '@/assets/moneybag_game.webp';
+import moneyBagExploding from '@/assets/moneybag_exploding.webp';
+import moneyBagSpilled from '@/assets/moneybag_spilled.webp';
 
 
 export const CHARACTERS: GameCharacter[] = [
@@ -78,6 +80,7 @@ export const CHARACTERS: GameCharacter[] = [
     objectName: 'Money Bag',
     objectEmoji: '💰',
     objectImage: moneyBagImage,
+    objectImageStages: [moneyBagImage, moneyBagExploding, moneyBagSpilled],
     spriteImage: jackalSprites,
     background: jackalBackground,
     spritePositions: {
