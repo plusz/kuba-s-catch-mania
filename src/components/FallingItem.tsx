@@ -7,6 +7,8 @@ interface FallingItemProps {
   emoji: string;
   /** Optional image to render instead of emoji */
   objectImage?: string;
+  /** Optional stages: cycled by drop progress */
+  objectImageStages?: string[];
   /** Character ID for per-character sizing */
   characterId?: string;
 }
@@ -25,7 +27,7 @@ const MOBILE_LANES: Record<Direction, { startX: number; startY: number; endX: nu
   'bottom-right': { startX: 90, startY: 82, endX: 62, endY: 62 },
 };
 
-const FallingItem = ({ object, emoji, objectImage, characterId }: FallingItemProps) => {
+const FallingItem = ({ object, emoji, objectImage, objectImageStages, characterId }: FallingItemProps) => {
   const isMobile = useIsMobile();
   const { direction, step } = object;
   const progress = Math.min(step, CATCH_STEP) / CATCH_STEP;
@@ -35,6 +37,10 @@ const FallingItem = ({ object, emoji, objectImage, characterId }: FallingItemPro
   const x = lane.startX + (lane.endX - lane.startX) * progress;
   const y = lane.startY + (lane.endY - lane.startY) * progress;
   const scale = 1.2 + progress * 1.2;
+
+  const stageImage = objectImageStages && objectImageStages.length > 0
+    ? objectImageStages[Math.min(Math.floor(progress * objectImageStages.length), objectImageStages.length - 1)]
+    : objectImage;
 
   return (
     <div
@@ -46,9 +52,9 @@ const FallingItem = ({ object, emoji, objectImage, characterId }: FallingItemPro
         zIndex: 20,
       }}
     >
-      {objectImage ? (
+      {stageImage ? (
         <img
-          src={objectImage}
+          src={stageImage}
           alt=""
           className="drop-shadow-lg"
           style={{ width: characterId === 'giraffe' ? '2.6rem' : '2rem', height: characterId === 'giraffe' ? '2.6rem' : '2rem', objectFit: 'contain' }}
