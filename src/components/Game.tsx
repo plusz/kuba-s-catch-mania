@@ -235,11 +235,12 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
     <div
       className={`relative w-full h-screen overflow-hidden ${shaking ? 'animate-shake' : ''}`}
       style={{
-        backgroundImage: `url(${isMobile ? mobileBackground : gameBackground})`,
+        backgroundImage: `url(${character.background ?? (isMobile ? mobileBackground : gameBackground)})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
     >
+
       
 
       <GameHud score={score} level={level} currentPose={currentPose} musicEnabled={musicEnabled} onToggleMusic={toggleMusic} />

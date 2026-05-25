@@ -20,11 +20,14 @@ export interface GameCharacter {
   /** Optional image for falling object (used instead of emoji) */
   objectImage?: string;
   spriteImage: string;
+  /** Optional custom background for this character */
+  background?: string;
   /** Sprite sheet layout: 2x2 grid mapping to directions */
   spritePositions: Record<Direction, { row: number; col: number }>;
   /** Whether this character requires a password to unlock */
   locked?: boolean;
 }
+
 
 /** Game state phases */
 export type GamePhase = 'select' | 'start' | 'playing' | 'gameover';
