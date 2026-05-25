@@ -19,6 +19,8 @@ export interface GameCharacter {
   objectEmoji: string;
   /** Optional image for falling object (used instead of emoji) */
   objectImage?: string;
+  /** Optional stages for falling object (cycled by progress) */
+  objectImageStages?: string[];
   spriteImage: string;
   /** Optional custom background for this character */
   background?: string;
