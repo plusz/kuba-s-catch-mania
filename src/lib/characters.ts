@@ -3,8 +3,12 @@ import lionSprites from '@/assets/lion_sprites.png';
 import mouseSprites from '@/assets/mouse_sprites.png';
 import anteaterSprites from '@/assets/anteater_sprites.png';
 import giraffeSprites from '@/assets/giraffe_sprites.png';
+import jackalSprites from '@/assets/jackal_sprites.webp';
+import jackalBackground from '@/assets/jackal_background.webp';
 import cookieImage from '@/assets/cookie_game.png';
 import palmImage from '@/assets/palm_game.png';
+import moneyBagImage from '@/assets/moneybag_game.webp';
+
 
 export const CHARACTERS: GameCharacter[] = [
   {
@@ -67,4 +71,21 @@ export const CHARACTERS: GameCharacter[] = [
     },
     locked: true,
   },
+  {
+    id: 'jackal',
+    name: 'Szymon',
+    displayName: 'Jackal Szymon',
+    objectName: 'Money Bag',
+    objectEmoji: '💰',
+    objectImage: moneyBagImage,
+    spriteImage: jackalSprites,
+    background: jackalBackground,
+    spritePositions: {
+      'top-left': { row: 0, col: 0 },
+      'top-right': { row: 0, col: 1 },
+      'bottom-left': { row: 1, col: 0 },
+      'bottom-right': { row: 1, col: 1 },
+    },
+  },
 ];
+
