@@ -3,6 +3,7 @@ import { CHARACTERS } from '@/lib/characters';
 import type { GameCharacter } from '@/lib/gameTypes';
 import { playClickSound } from '@/lib/audio';
 import { verifyPassword } from '@/lib/password';
+import Footer from '@/components/Footer';
 
 interface CharacterSelectProps {
   onSelect: (character: GameCharacter) => void;
@@ -131,17 +132,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
         </div>
       )}
 
-      {/* Footer */}
-      <div className="mt-12 text-center">
-        <a
-          href="https://www.ZwierzetaDetektywi.pl"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-muted-foreground hover:text-secondary transition-colors"
-        >
-          © 2026 www.ZwierzetaDetektywi.pl
-        </a>
-      </div>
+      <Footer />
     </div>
   );
 };
