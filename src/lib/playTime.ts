@@ -1,71 +1,109 @@
-const COOKIE_NAME = 'play_session';
-const WARNING_MINUTES = 15;
-const LOCK_MINUTES = 30;
-const LOCK_DURATION_MS = 60 * 60 * 1000; // 1 hour
+/**
+ * Play-time limiting (parity with Android GameSession).
+ *
+ * Time is counted ONLY while a round is running — beginPlay() marks the
+ * start of a round, endPlay() banks the elapsed time into `playedMs`.
+ * Menu/idle/closed-tab time does not count. After 4h without playing the
+ * counter resets. 15 min played → continue prompt; 30 min → 1h lock.
+ */
+
+const STORAGE_KEY = 'catch-play-session';
+
+const WARNING_MS = 15 * 60 * 1000; // 15 min played → warning
+const LOCK_MS = 30 * 60 * 1000; //    30 min played → lock
+const LOCK_DURATION_MS = 60 * 60 * 1000; // lock lasts 1h
+const RESET_IDLE_MS = 4 * 60 * 60 * 1000; // 4h without playing resets playedMs
 
 interface PlaySession {
-  startedAt: number;
+  /** Total ms played across finished rounds */
+  playedMs: number;
+  /** Last time the player did anything (round start/end) */
+  lastActive: number;
+  /** Timestamp of the currently running round, if any */
+  playStart?: number;
   lockedUntil?: number;
 }
 
-function getCookie(): PlaySession | null {
-  const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`));
-  if (!match) return null;
+function load(): PlaySession | null {
   try {
-    return JSON.parse(decodeURIComponent(match[1]));
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as PlaySession) : null;
   } catch {
     return null;
   }
 }
 
-function setCookie(session: PlaySession) {
-  const maxAge = 2 * 60 * 60; // 2h
-  document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(session))};path=/;max-age=${maxAge};SameSite=Lax`;
+function save(session: PlaySession) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
 }
 
-export function initSession() {
-  const existing = getCookie();
-  if (!existing || existing.lockedUntil) return;
-  // session already running, keep it
+/** Mark the start of a round. */
+export function beginPlay() {
+  const s = load() ?? { playedMs: 0, lastActive: 0 };
+  s.playStart = Date.now();
+  s.lastActive = Date.now();
+  save(s);
 }
 
-export function ensureSession() {
-  const existing = getCookie();
-  if (existing && !isLocked()) return;
-  setCookie({ startedAt: Date.now() });
+/** Bank the current round's elapsed time. Idempotent. */
+export function endPlay() {
+  const s = load();
+  if (!s?.playStart) return;
+  s.playedMs += Date.now() - s.playStart;
+  s.playStart = undefined;
+  s.lastActive = Date.now();
+  save(s);
 }
 
-function getElapsedMinutes(): number {
-  const session = getCookie();
-  if (!session) return 0;
-  return (Date.now() - session.startedAt) / 60000;
+export type PlayCheck = 'play' | 'warn' | 'locked';
+
+/** Gate checked before starting a round (Android: checkBeforeStart). */
+export function checkBeforeStart(): PlayCheck {
+  const now = Date.now();
+  const s = load() ?? { playedMs: 0, lastActive: now };
+
+  if (s.lockedUntil) {
+    if (now < s.lockedUntil) {
+      save(s);
+      return 'locked';
+    }
+    // lock expired → clear and reset the counter
+    s.lockedUntil = undefined;
+    s.playedMs = 0;
+  }
+
+  if (now - s.lastActive >= RESET_IDLE_MS) {
+    s.playedMs = 0;
+  }
+
+  if (s.playedMs >= LOCK_MS) {
+    s.lockedUntil = now + LOCK_DURATION_MS;
+    save(s);
+    return 'locked';
+  }
+
+  save(s);
+  return s.playedMs >= WARNING_MS ? 'warn' : 'play';
 }
 
 export function isLocked(): boolean {
-  const session = getCookie();
-  if (!session?.lockedUntil) return false;
-  if (Date.now() < session.lockedUntil) return true;
-  // lock expired, clear
-  setCookie({ startedAt: Date.now() });
+  const s = load();
+  if (!s?.lockedUntil) return false;
+  if (Date.now() < s.lockedUntil) return true;
+  // lock expired → clear and reset the counter
+  s.lockedUntil = undefined;
+  s.playedMs = 0;
+  save(s);
   return false;
 }
 
 export function getLockRemainingMinutes(): number {
-  const session = getCookie();
-  if (!session?.lockedUntil) return 0;
-  return Math.max(0, Math.ceil((session.lockedUntil - Date.now()) / 60000));
+  const s = load();
+  if (!s?.lockedUntil) return 0;
+  return Math.max(0, Math.ceil((s.lockedUntil - Date.now()) / 60000));
 }
 
-export function shouldShowWarning(): boolean {
-  return getElapsedMinutes() >= WARNING_MINUTES && !isLocked();
+/** Dev bypass — clears everything. */
+export function resetSession() {
+  localStorage.removeItem(STORAGE_KEY);
 }
-
-export function shouldLock(): boolean {
-  return getElapsedMinutes() >= LOCK_MINUTES;
-}
-
-export function activateLock() {
-  setCookie({ startedAt: Date.now(), lockedUntil: Date.now() + LOCK_DURATION_MS });
-}
-
-export { WARNING_MINUTES, LOCK_MINUTES };

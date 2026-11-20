@@ -8,6 +8,8 @@ export interface FallingObject {
   /** Current step: 0 = just spawned, CATCH_STEP = at catch zone */
   step: number;
   caught: boolean;
+  /** Reached the last step without a matching pose — one grace tick left to catch it */
+  pendingMiss?: boolean;
 }
 
 /** Character definition for extensibility */
@@ -22,6 +24,10 @@ export interface GameCharacter {
   /** Optional stages for falling object (cycled by progress) */
   objectImageStages?: string[];
   spriteImage: string;
+  /** Sprite size relative to the base size (mouse smaller, anteater bigger) */
+  spriteScale?: number;
+  /** Falling object size relative to the base size */
+  objectScale?: number;
   /** Optional custom background for this character */
   background?: string;
   /** Sprite sheet layout: 2x2 grid mapping to directions */

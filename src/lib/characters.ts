@@ -34,6 +34,7 @@ export const CHARACTERS: GameCharacter[] = [
     objectName: 'Cheese',
     objectEmoji: '🧀',
     spriteImage: mouseSprites,
+    spriteScale: 0.8,
     spritePositions: {
       'top-left': { row: 0, col: 0 },
       'top-right': { row: 0, col: 1 },
@@ -49,6 +50,7 @@ export const CHARACTERS: GameCharacter[] = [
     objectEmoji: '🍪',
     objectImage: cookieImage,
     spriteImage: anteaterSprites,
+    spriteScale: 1.15,
     spritePositions: {
       'top-left': { row: 0, col: 0 },
       'top-right': { row: 0, col: 1 },
@@ -64,6 +66,7 @@ export const CHARACTERS: GameCharacter[] = [
     objectName: 'Palm Leaf',
     objectEmoji: '🌿',
     objectImage: palmImage,
+    objectScale: 1.3,
     spriteImage: giraffeSprites,
     spritePositions: {
       'top-left': { row: 0, col: 0 },
@@ -80,6 +83,7 @@ export const CHARACTERS: GameCharacter[] = [
     objectName: 'Money Bag',
     objectEmoji: '💰',
     objectImage: moneyBagImage,
+    objectScale: 1.3,
     objectImageStages: [moneyBagImage, moneyBagExploding, moneyBagSpilled],
     spriteImage: jackalSprites,
     background: jackalBackground,

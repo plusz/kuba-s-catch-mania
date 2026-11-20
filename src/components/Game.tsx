@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { Direction, FallingObject, GameCharacter } from '@/lib/gameTypes';
 import {
   trySpawnObject,
@@ -7,13 +7,22 @@ import {
   resetIdCounter,
   CATCH_STEP,
 } from '@/lib/gameEngine';
+import {
+  buildLanes,
+  objectBasePx,
+  useViewportSize,
+  VISUAL_SUBSTEPS,
+  CATCH_ANIM_MS,
+} from '@/lib/layout';
+import { beginPlay, endPlay } from '@/lib/playTime';
 import { useGameControls } from '@/lib/controls';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { playCatchSound, playMissSound, playStepSound } from '@/lib/audio';
+import { playCatchSound, playMissSound, playStepSound, playDropSound } from '@/lib/audio';
 import { trackGameOver } from '@/lib/analytics';
 import { useBackgroundMusic } from '@/hooks/useBackgroundMusic';
 import CharacterSprite from './CharacterSprite';
 import FallingItem from './FallingItem';
+import DyingItem, { type DyingEntry } from './DyingItem';
 import GameHud from './GameHud';
 import GameOverModal from './GameOverModal';
 import gameBackground from '@/assets/game_background.png';
@@ -28,17 +37,20 @@ interface GameProps {
 const STORAGE_KEY = 'catch-game-best-score';
 
 /**
- * HOW CATCHING WORKS (discrete step system):
- * 
- * 1. Objects move in discrete steps (0 to 7), one step per "tick".
- * 2. Tick interval starts at 1000ms (1/sec) and speeds up to 100ms (10/sec).
- * 3. When an object reaches step CATCH_STEP (7), it's at ramp end (catch zone).
- * 4. The player must press the matching direction key (A/Z/L/M) while the
- *    object is at step 7. The key press checks objects at step 7 for that direction.
- * 5. If an object at step 7 is NOT caught by the next tick, it misses and game ends.
- * 6. Objects are never spawned if they'd arrive at the catch zone too close
- *    to another object (MIN_ARRIVAL_GAP_STEPS=3), so the player always has
- *    time to react between catches.
+ * HOW CATCHING WORKS (discrete step system, parity with Android/iOS spec):
+ *
+ * 1. Objects move in discrete steps (0 to 6), one engine step per "tick".
+ *    The view snaps each step through 2 sub-hops via a frame clock.
+ * 2. Tick interval starts at 1000ms and speeds up to 100ms (10/sec).
+ * 3. Objects fly in from off-screen along a lane ending at the character's paw.
+ * 4. When an object reaches step CATCH_STEP (6), a matching pose catches it.
+ *    Otherwise it gets a grace tick (pendingMiss) sitting at the paw — a press
+ *    can still rescue it (press catches any object at step >= CATCH_STEP - 1).
+ *    Uncaught after the grace tick → miss → game over.
+ * 5. Caught/missed objects leave the list instantly and finish with a short
+ *    animation (fly-to-paw / spilled-at-paw), like the Android dying list.
+ * 6. Objects never spawn while another is in the first steps of its lane, so
+ *    arrivals always have a reaction gap (MIN_ARRIVAL_GAP_STEPS=3).
  */
 const Game = ({ character, onMenu, onNewGame }: GameProps) => {
   const isMobile = useIsMobile();
@@ -46,7 +58,10 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
   const [gameOver, setGameOver] = useState(false);
   const [currentPose, setCurrentPose] = useState<Direction | null>('top-left');
   const [objects, setObjects] = useState<FallingObject[]>([]);
+  const [dying, setDying] = useState<DyingEntry[]>([]);
   const [shaking, setShaking] = useState(false);
+  const [hidden, setHidden] = useState(document.hidden);
+  const [now, setNow] = useState(0);
   const [debugLines, setDebugLines] = useState<string[]>([]);
 
   const scoreRef = useRef(0);
@@ -55,6 +70,10 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
   const gameOverRef = useRef(false);
   const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ticksSinceSpawnRef = useRef(0);
+  const tickCountRef = useRef(0);
+  /** performance.now() of the last engine tick — drives inter-tick sub-hops */
+  const lastTickRef = useRef(0);
+  const lastHopRef = useRef(-1);
 
   useEffect(() => { objectsRef.current = objects; }, [objects]);
   useEffect(() => { poseRef.current = currentPose; }, [currentPose]);
@@ -62,7 +81,15 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
   useEffect(() => { gameOverRef.current = gameOver; }, [gameOver]);
 
   const level = getLevel(score);
-  const { musicEnabled, toggleMusic } = useBackgroundMusic(!gameOver);
+  const intervalMs = getTickInterval(level);
+  const { musicEnabled, toggleMusic } = useBackgroundMusic(!gameOver && !hidden);
+
+  const { vw, vh } = useViewportSize();
+  const lanes = useMemo(
+    () => buildLanes(isMobile, character.spriteScale ?? 1, vw, vh),
+    [isMobile, character.spriteScale, vw, vh]
+  );
+  const objBase = objectBasePx(isMobile, character.objectScale ?? 1);
 
   const [bestScore, setBestScore] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -80,7 +107,22 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
     setDebugLines((prev) => [...prev.slice(-10), line]);
   }, []);
 
-  // Handle direction input — check for catchable objects near ramp end
+  /** Queue a short catch/miss animation for an object leaving the list. */
+  const pushDying = useCallback((obj: FallingObject, missed: boolean) => {
+    const entry: DyingEntry = {
+      id: `d-${obj.id}-${missed ? 'm' : 'c'}`,
+      direction: obj.direction,
+      step: obj.step,
+      missed,
+      startMs: performance.now(),
+    };
+    setDying((prev) => [...prev, entry]);
+    setTimeout(() => {
+      setDying((prev) => prev.filter((d) => d.id !== entry.id));
+    }, CATCH_ANIM_MS + 60);
+  }, []);
+
+  // Handle direction input — pose change + rescue catch near the paw
   const handleDirection = useCallback((dir: Direction) => {
     if (gameOverRef.current) return;
     setCurrentPose(dir);
@@ -92,117 +134,104 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
 
     appendDebug(
       `INPUT dir=${dir} pose=${dir} objs=${currentObjects
-        .map((o) => `${o.direction}@${o.step}`)
+        .map((o) => `${o.direction}@${o.step}${o.pendingMiss ? '!' : ''}`)
         .join(',') || 'none'} catch=${catchable ? `${catchable.direction}@${catchable.step}` : 'none'}`
     );
 
     if (catchable) {
       playCatchSound();
-      setObjects((prev) => {
-        const updated = prev.filter((o) => o.id !== catchable.id);
-        objectsRef.current = updated;
-        return updated;
-      });
+      const updated = currentObjects.filter((o) => o.id !== catchable.id);
+      objectsRef.current = updated;
+      setObjects(updated);
       setScore((prev) => prev + 1);
+      pushDying(catchable, false);
       appendDebug(`CAUGHT dir=${dir} step=${catchable.step}`);
     }
-  }, [appendDebug]);
+  }, [appendDebug, pushDying]);
 
   useGameControls(handleDirection, !gameOver);
 
-  /** One game tick: advance all objects by 1 step, auto-catch by current pose, check misses, maybe spawn */
+  /** One engine tick: advance objects, resolve paw arrivals (catch/grace/miss), maybe spawn */
   const doTick = useCallback(() => {
     if (gameOverRef.current) return;
 
-    let missed = false;
+    tickCountRef.current++;
+    lastTickRef.current = performance.now();
 
-    setObjects((prev) => {
-      let caughtCount = 0;
-      const updated = prev
-        .map((obj) => {
-          if (obj.caught) return obj;
+    const prev = objectsRef.current;
+    const caughtNow: FallingObject[] = [];
+    let missedObj: FallingObject | null = null;
+    const updated: FallingObject[] = [];
 
-          const poseCatch =
-            !!poseRef.current &&
-            obj.direction === poseRef.current &&
-            obj.step >= CATCH_STEP - 1;
-
-          if (poseCatch) {
-            caughtCount++;
-            return null;
-          }
-
-          const newStep = obj.step + 1;
-          if (newStep > CATCH_STEP) {
-            missed = true;
-            return { ...obj, step: CATCH_STEP };
-          }
-
-          return { ...obj, step: newStep };
-        })
-        .filter((obj): obj is FallingObject => obj !== null && !obj.caught);
-
-      objectsRef.current = updated;
-
-      if (missed) {
-        playMissSound();
-        setShaking(true);
-        setTimeout(() => setShaking(false), 300);
-        setGameOver(true);
-        trackGameOver(scoreRef.current, getLevel(scoreRef.current));
-        return updated;
+    for (const obj of prev) {
+      if (obj.caught) continue;
+      if (obj.step >= CATCH_STEP) {
+        // object is at the paw: matching pose catches, pendingMiss misses,
+        // otherwise it gets one grace tick at the paw
+        if (poseRef.current && obj.direction === poseRef.current) {
+          caughtNow.push(obj);
+        } else if (obj.pendingMiss) {
+          missedObj = obj;
+        } else {
+          updated.push({ ...obj, pendingMiss: true });
+        }
+        continue;
       }
+      updated.push({ ...obj, step: obj.step + 1 });
+    }
 
-      if (caughtCount > 0) {
-        playCatchSound();
-        setScore((s) => s + caughtCount);
-        appendDebug(`AUTO-CAUGHT count=${caughtCount} pose=${poseRef.current}`);
-      }
-
-      return updated;
-    });
+    objectsRef.current = updated;
+    setObjects(updated);
 
     appendDebug(
-      `TICK pose=${poseRef.current ?? 'none'} objs=${objectsRef.current
-        .map((o) => `${o.direction}@${o.step}${o.direction === poseRef.current && o.step >= CATCH_STEP - 1 ? '[match]' : ''}`)
+      `TICK pose=${poseRef.current ?? 'none'} objs=${updated
+        .map((o) => `${o.direction}@${o.step}${o.pendingMiss ? '!' : ''}`)
         .join(',') || 'none'}`
     );
 
-    if (missed) {
+    if (caughtNow.length > 0) {
+      playCatchSound();
+      setScore((s) => s + caughtNow.length);
+      caughtNow.forEach((o) => pushDying(o, false));
+      appendDebug(`AUTO-CAUGHT count=${caughtNow.length} pose=${poseRef.current}`);
+    }
+
+    if (missedObj) {
+      pushDying(missedObj, true);
+      playMissSound();
+      setShaking(true);
+      setTimeout(() => setShaking(false), 300);
+      gameOverRef.current = true;
+      setGameOver(true);
+      trackGameOver(scoreRef.current, getLevel(scoreRef.current));
       appendDebug('MISS -> game over');
       return;
     }
-
-    // Play step sound for each tick (audible rhythm)
-    playStepSound();
 
     // Try to spawn a new object every few ticks
     ticksSinceSpawnRef.current++;
     if (ticksSinceSpawnRef.current >= 3) {
       const newObj = trySpawnObject(objectsRef.current);
       if (newObj) {
-        setObjects((prev) => [...prev, newObj]);
+        const withNew = [...objectsRef.current, newObj];
+        objectsRef.current = withNew;
+        setObjects(withNew);
         ticksSinceSpawnRef.current = 0;
+        playDropSound();
         appendDebug(`SPAWN ${newObj.direction}@${newObj.step}`);
       }
     }
-  }, [appendDebug]);
+  }, [appendDebug, pushDying]);
 
   /** Start or restart the tick interval */
   const startTickLoop = useCallback(() => {
     if (tickIntervalRef.current) clearInterval(tickIntervalRef.current);
-
-    const currentLevel = getLevel(scoreRef.current);
-    const interval = getTickInterval(currentLevel);
-
-    tickIntervalRef.current = setInterval(() => {
-      doTick();
-    }, interval);
+    tickIntervalRef.current = setInterval(doTick, getTickInterval(getLevel(scoreRef.current)));
   }, [doTick]);
 
-  // Adjust tick speed when level changes
+  // Adjust tick speed when level changes; pause engine while tab is hidden
   useEffect(() => {
-    if (gameOver) {
+    if (gameOver || hidden) {
       if (tickIntervalRef.current) clearInterval(tickIntervalRef.current);
       return;
     }
@@ -210,24 +239,62 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
     return () => {
       if (tickIntervalRef.current) clearInterval(tickIntervalRef.current);
     };
-  }, [level, gameOver, startTickLoop]);
+  }, [level, gameOver, hidden, startTickLoop]);
+
+  // Freeze the round when the tab is hidden (engine + music); resume cleanly
+  useEffect(() => {
+    const onVisibility = () => {
+      const h = document.hidden;
+      setHidden(h);
+      if (!h) lastTickRef.current = performance.now();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
+  // Frame clock — drives inter-tick hops and catch/miss animations.
+  // Only runs while something is animated (Android: same optimization).
+  const animActive = objects.length > 0 || dying.length > 0;
+  useEffect(() => {
+    if (!animActive) return;
+    let raf: number;
+    const loop = (t: number) => {
+      setNow(t);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [animActive]);
+
+  const frac =
+    lastTickRef.current > 0
+      ? Math.min(1, Math.max(0, (now - lastTickRef.current) / intervalMs))
+      : 0;
+
+  // One blip per visible hop — all objects share frac, so they hop in sync.
+  // Silent when nothing is falling (sound is per-hop, not per-second).
+  const hop = tickCountRef.current * VISUAL_SUBSTEPS + Math.floor(frac * VISUAL_SUBSTEPS);
+  useEffect(() => {
+    if (lastHopRef.current >= 0 && hop > lastHopRef.current && objects.length > 0) {
+      playStepSound();
+    }
+    lastHopRef.current = hop;
+  }, [hop, objects.length]);
+
+  // Play-time accounting: the counter only runs during an active round
+  useEffect(() => {
+    beginPlay();
+    return () => endPlay();
+  }, []);
+  useEffect(() => {
+    if (gameOver) endPlay();
+  }, [gameOver]);
 
   // Initial setup
   useEffect(() => {
     resetIdCounter();
     ticksSinceSpawnRef.current = 10; // spawn immediately on first tick
   }, []);
-
-  const handlePlayAgain = () => {
-    resetIdCounter();
-    setScore(0);
-    setObjects([]);
-    setCurrentPose(null);
-    setGameOver(false);
-    setDebugLines([]);
-    gameOverRef.current = false;
-    ticksSinceSpawnRef.current = 10;
-  };
 
   const objectEmoji = character.objectEmoji;
 
@@ -240,9 +307,6 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
         backgroundPosition: 'center',
       }}
     >
-
-      
-
       <GameHud score={score} level={level} currentPose={currentPose} musicEnabled={musicEnabled} onToggleMusic={toggleMusic} />
 
       <div className="absolute z-10" style={{ left: '50%', top: isMobile ? '58%' : '65%', transform: 'translate(-50%, -50%)' }}>
@@ -250,13 +314,35 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
       </div>
 
       {objects.map((obj) => (
-        <FallingItem key={obj.id} object={obj} emoji={objectEmoji} objectImage={character.objectImage} objectImageStages={character.objectImageStages} characterId={character.id} />
+        <FallingItem
+          key={obj.id}
+          object={obj}
+          lane={lanes[obj.direction]}
+          frac={frac}
+          baseSize={objBase}
+          emoji={objectEmoji}
+          objectImage={character.objectImage}
+          objectImageStages={character.objectImageStages}
+        />
+      ))}
+
+      {dying.map((d) => (
+        <DyingItem
+          key={d.id}
+          item={d}
+          lane={lanes[d.direction]}
+          baseSize={objBase}
+          now={now}
+          emoji={objectEmoji}
+          objectImage={character.objectImage}
+          objectImageStages={character.objectImageStages}
+        />
       ))}
 
       {new URLSearchParams(window.location.search).has('debug') && (
         <div className="absolute left-2 bottom-2 z-30 max-w-[92vw] rounded-md border border-border bg-card/85 p-2 text-xs text-card-foreground">
           <div className="font-semibold">DEBUG CATCH</div>
-          <div>pose: {currentPose ?? 'none'} | catchWindow: step ≥ {CATCH_STEP - 1}</div>
+          <div>pose: {currentPose ?? 'none'} | press catches step ≥ {CATCH_STEP - 1}, pose catches at {CATCH_STEP}</div>
           {debugLines.length === 0 ? (
             <div>brak logów…</div>
           ) : (

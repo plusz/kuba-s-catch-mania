@@ -26,7 +26,7 @@ export function playStepSound() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.04);
-  } catch {}
+  } catch { /* audio unavailable */ }
 }
 
 /** Play a soft, short, gentle "catch" blip — higher than step sound */
@@ -44,7 +44,7 @@ export function playCatchSound() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.08);
-  } catch {}
+  } catch { /* audio unavailable */ }
 }
 
 /** Play a "miss/game over" sound — descending tone */
@@ -62,7 +62,25 @@ export function playMissSound() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.5);
-  } catch {}
+  } catch { /* audio unavailable */ }
+}
+
+/** Descending "whoosh" when a new object spawns (620→300Hz, 100ms) */
+export function playDropSound() {
+  try {
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(620, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.1);
+  } catch { /* audio unavailable */ }
 }
 
 /** Short UI click sound */
@@ -79,5 +97,5 @@ export function playClickSound() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.05);
-  } catch {}
+  } catch { /* audio unavailable */ }
 }

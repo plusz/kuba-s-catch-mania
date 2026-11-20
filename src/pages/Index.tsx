@@ -6,10 +6,7 @@ import Game from '@/components/Game';
 import PlayTimeWarning from '@/components/PlayTimeWarning';
 import PlayTimeLock from '@/components/PlayTimeLock';
 import {
-  ensureSession,
-  shouldShowWarning,
-  shouldLock,
-  activateLock,
+  checkBeforeStart,
   isLocked,
   getLockRemainingMinutes,
 } from '@/lib/playTime';
@@ -27,37 +24,32 @@ const Index = () => {
     setPhase('start');
   };
 
-  const handleStart = () => {
-    ensureSession();
-    // First start doesn't need time check
+  /** Gate before starting a round — only actual play time counts */
+  const checkAndPlay = (restart: boolean) => {
+    const check = checkBeforeStart();
+    if (check === 'locked') {
+      trackPlayTime(30);
+      setShowLock(true);
+      return;
+    }
+    if (check === 'warn') {
+      trackPlayTime(15);
+      setShowWarning(true);
+      return;
+    }
+    if (restart) setGameKey((k) => k + 1);
     setPhase('playing');
   };
+
+  const handleStart = () => checkAndPlay(false);
 
   const handleBackToSelect = () => {
     setCharacter(null);
     setPhase('select');
   };
 
-  /** Called when user clicks "Play Again" or "Start Game" — check time limits */
-  const handleNewGame = () => {
-    if (isLocked()) {
-      setShowLock(true);
-      return;
-    }
-    if (shouldLock()) {
-      trackPlayTime(30);
-      activateLock();
-      setShowLock(true);
-      return;
-    }
-    if (shouldShowWarning()) {
-      trackPlayTime(15);
-      setShowWarning(true);
-      return;
-    }
-    setGameKey((k) => k + 1);
-    setPhase('playing');
-  };
+  /** Called when user clicks "Play Again" — check time limits */
+  const handleNewGame = () => checkAndPlay(true);
 
   if (showLock) {
     return <PlayTimeLock remainingMinutes={getLockRemainingMinutes()} onMenu={handleBackToSelect} />;
@@ -68,6 +60,7 @@ const Index = () => {
       <PlayTimeWarning
         onContinue={() => {
           setShowWarning(false);
+          setGameKey((k) => k + 1); // remount Game — may be coming from a game-over restart
           setPhase('playing');
         }}
         onMenu={() => {
