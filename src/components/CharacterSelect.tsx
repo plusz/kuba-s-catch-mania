@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CHARACTERS } from '@/lib/characters';
 import type { GameCharacter } from '@/lib/gameTypes';
+import { useImageAspect } from '@/hooks/use-image-aspect';
 import { playClickSound } from '@/lib/audio';
 import { verifyPassword } from '@/lib/password';
 import Footer from '@/components/Footer';
@@ -10,6 +11,33 @@ interface CharacterSelectProps {
 }
 
 const UNLOCK_STORAGE_KEY = 'catch-game-unlocked';
+
+/**
+ * Card thumbnail: shows exactly the top row (2 poses) of the sprite sheet.
+ * The sheet is a 2x2 grid, so the top half has aspect = 2 * sheet aspect —
+ * a box with that ratio + object-cover/object-top crops the bottom row off
+ * cleanly for every character regardless of sheet proportions.
+ */
+const CharacterThumb = ({ char, isLocked }: { char: GameCharacter; isLocked: boolean }) => {
+  const aspect = useImageAspect(char.spriteImage);
+  return (
+    <div
+      className="relative h-24 sm:h-32 max-w-full rounded-lg overflow-hidden bg-muted"
+      style={{ aspectRatio: aspect ? String(2 * aspect) : '1.33' }}
+    >
+      <img
+        src={char.spriteImage}
+        alt={char.displayName}
+        className={`w-full h-full object-cover object-top ${isLocked ? 'blur-sm grayscale' : ''}`}
+      />
+      {isLocked && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-4xl">🔒</span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 /** Character selection screen */
 const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
@@ -63,18 +91,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                   : 'border-border hover:border-secondary hover:scale-105 hover:shadow-xl hover:shadow-secondary/20'
               }`}
             >
-              <div className="relative w-28 h-28 sm:w-40 sm:h-40 rounded-lg overflow-hidden bg-muted">
-                <img
-                  src={char.spriteImage}
-                  alt={char.displayName}
-                  className={`w-full h-full object-cover object-top ${isLocked ? 'blur-sm grayscale' : ''}`}
-                />
-                {isLocked && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-4xl">🔒</span>
-                  </div>
-                )}
-              </div>
+              <CharacterThumb char={char} isLocked={isLocked} />
               <span className={`font-arcade text-sm transition-colors ${
                 isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-secondary'
               }`}>

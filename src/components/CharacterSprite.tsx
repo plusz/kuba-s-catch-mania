@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import type { Direction, GameCharacter } from '@/lib/gameTypes';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useImageAspect } from '@/hooks/use-image-aspect';
 import { spriteWidthPx } from '@/lib/layout';
 
 interface CharacterSpriteProps {
@@ -26,12 +26,7 @@ const CharacterSprite = ({ character, pose }: CharacterSpriteProps) => {
   const bgX = pos.col === 0 ? '0%' : '100%';
   const bgY = pos.row === 0 ? '0%' : '100%';
 
-  const [aspect, setAspect] = useState<number | null>(null);
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => setAspect(img.naturalWidth / img.naturalHeight);
-    img.src = character.spriteImage;
-  }, [character.spriteImage]);
+  const aspect = useImageAspect(character.spriteImage);
 
   const width = spriteWidthPx(isMobile, character.spriteScale ?? 1);
 
