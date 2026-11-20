@@ -1,6 +1,7 @@
 import { Volume2, VolumeX } from 'lucide-react';
 import { DIRECTION_KEYS } from '@/lib/gameTypes';
 import type { Direction } from '@/lib/gameTypes';
+import { useLang } from '@/lib/i18n';
 
 interface GameHudProps {
   score: number;
@@ -12,6 +13,7 @@ interface GameHudProps {
 
 /** Heads-up display showing score, level, and key hints */
 const GameHud = ({ score, level, currentPose, musicEnabled, onToggleMusic }: GameHudProps) => {
+  const { t } = useLang();
   const directions: Direction[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 
   return (
@@ -19,19 +21,19 @@ const GameHud = ({ score, level, currentPose, musicEnabled, onToggleMusic }: Gam
       {/* Top bar */}
       <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-10">
         <div className="bg-card/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-border">
-          <p className="font-arcade text-xs text-muted-foreground">Score</p>
+          <p className="font-arcade text-xs text-muted-foreground">{t('score')}</p>
           <p className="font-arcade text-lg text-secondary">{score}</p>
         </div>
         <div className="flex items-start gap-2">
           <button
             onClick={onToggleMusic}
             className="bg-card/80 backdrop-blur-sm rounded-lg px-3 py-3 border border-border text-muted-foreground hover:text-foreground transition-colors"
-            aria-label={musicEnabled ? 'Mute music' : 'Unmute music'}
+            aria-label={musicEnabled ? t('muteMusic') : t('unmuteMusic')}
           >
             {musicEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
           </button>
           <div className="bg-card/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-border">
-            <p className="font-arcade text-xs text-muted-foreground">Level</p>
+            <p className="font-arcade text-xs text-muted-foreground">{t('level')}</p>
             <p className="font-arcade text-lg text-primary">{level}</p>
           </div>
         </div>

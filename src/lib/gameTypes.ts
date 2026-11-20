@@ -17,7 +17,11 @@ export interface GameCharacter {
   id: string;
   name: string;
   displayName: string;
+  /** Polish display name (default language) */
+  displayNamePl?: string;
   objectName: string;
+  /** Polish object name (default language) */
+  objectNamePl?: string;
   objectEmoji: string;
   /** Optional image for falling object (used instead of emoji) */
   objectImage?: string;

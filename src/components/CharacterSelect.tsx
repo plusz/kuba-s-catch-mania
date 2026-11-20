@@ -4,6 +4,7 @@ import type { GameCharacter } from '@/lib/gameTypes';
 import { useImageAspect } from '@/hooks/use-image-aspect';
 import { playClickSound } from '@/lib/audio';
 import { verifyPassword } from '@/lib/password';
+import { useLang, useLabels } from '@/lib/i18n';
 import Footer from '@/components/Footer';
 
 interface CharacterSelectProps {
@@ -48,6 +49,8 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState(false);
+  const { t } = useLang();
+  const { charName, objName } = useLabels();
 
   const handleUnlock = () => {
     if (verifyPassword(passwordInput)) {
@@ -68,7 +71,7 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
         🎮 Catch Game
       </h1>
       <p className="font-arcade text-xs text-muted-foreground mb-12">
-        Choose your character
+        {t('chooseChar')}
       </p>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-8 justify-items-center max-w-lg">
@@ -96,10 +99,10 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
               <span className={`font-arcade text-sm transition-colors ${
                 isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-secondary'
               }`}>
-                {char.displayName}
+                {charName(char)}
               </span>
               <span className="text-xs text-muted-foreground">
-                {isLocked ? 'Locked' : `Catches ${char.objectName}`}
+                {isLocked ? t('lockedLabel') : t('catches', { obj: objName(char) })}
               </span>
             </button>
           );
@@ -112,10 +115,10 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
           <div className="bg-card border-2 border-border rounded-xl p-6 sm:p-8 max-w-sm w-[calc(100%-2rem)] sm:w-full mx-4 flex flex-col items-center gap-4">
             <span className="text-4xl">🔐</span>
             <h2 className="font-arcade text-sm text-secondary text-center">
-              Secret Characters
+              {t('secretTitle')}
             </h2>
             <p className="text-xs text-muted-foreground text-center">
-              💡 Hint: enter the name of the rooster from the tale of happiness
+              {t('secretHint')}
             </p>
             <input
               type="text"
@@ -125,25 +128,25 @@ const CharacterSelect = ({ onSelect }: CharacterSelectProps) => {
                 setPasswordError(false);
               }}
               onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
-              placeholder="Enter password..."
+              placeholder={t('answerPlaceholder')}
               className="w-full px-4 py-2 rounded-lg bg-muted border border-border text-foreground text-center font-arcade text-xs focus:outline-none focus:border-secondary"
               autoFocus
             />
             {passwordError && (
-              <p className="text-xs text-destructive font-arcade">Wrong password!</p>
+              <p className="text-xs text-destructive font-arcade">{t('wrongAnswer')}</p>
             )}
             <div className="flex gap-3">
               <button
                 onClick={() => { setShowPasswordModal(false); setPasswordInput(''); setPasswordError(false); }}
                 className="font-arcade text-xs px-5 py-2 rounded-lg bg-muted text-muted-foreground hover:bg-border transition-colors"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 onClick={handleUnlock}
                 className="font-arcade text-xs px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
               >
-                Unlock
+                {t('unlock')}
               </button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useLang } from '@/lib/i18n';
 
 const sections: { title: string; body: React.ReactNode }[] = [
   {
@@ -52,7 +53,9 @@ const sections: { title: string; body: React.ReactNode }[] = [
   },
 ];
 
-const Privacy = () => (
+const Privacy = () => {
+  const { t } = useLang();
+  return (
   <div className="min-h-screen p-4 sm:p-8 flex flex-col items-center">
     <div className="max-w-2xl w-full bg-card border border-border rounded-xl p-6 sm:p-8">
       <h1 className="font-arcade text-lg sm:text-2xl text-secondary mb-1 text-center">
@@ -79,9 +82,10 @@ const Privacy = () => (
       to="/"
       className="mt-6 text-xs text-muted-foreground hover:text-secondary transition-colors"
     >
-      ← Powrót do gry
+      {t('backToGame')}
     </Link>
   </div>
-);
+  );
+};
 
 export default Privacy;
