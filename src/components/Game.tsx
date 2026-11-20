@@ -46,8 +46,9 @@ const STORAGE_KEY = 'catch-game-best-score';
  * 3. Objects fly in from off-screen along a lane ending at the character's paw.
  * 4. When an object reaches step CATCH_STEP (6), a matching pose catches it.
  *    Otherwise it gets a grace tick (pendingMiss) sitting at the paw — a press
- *    can still rescue it (press catches any object at step >= CATCH_STEP - 1).
- *    Uncaught after the grace tick → miss → game over.
+ *    can still rescue it (press rescues only objects visibly at the paw,
+ *    i.e. renderStep >= CATCH_STEP - 1; earlier presses just pre-pose the
+ *    character for the auto-catch). Uncaught after the grace tick → miss.
  * 5. Caught/missed objects leave the list instantly and finish with a short
  *    animation (fly-to-paw / spilled-at-paw), like the Android dying list.
  * 6. Objects never spawn while another is in the first steps of its lane, so
@@ -130,14 +131,32 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
     }, CATCH_ANIM_MS + 60);
   }, []);
 
-  // Handle direction input — pose change + rescue catch near the paw
+  // Handle direction input — pose change + rescue catch at the paw.
+  // NOTE: check the quantized RENDER step, not obj.step — the engine runs
+  // one step ahead of the visual position (renderStep = step - 1 + sub), so
+  // obj.step >= CATCH_STEP - 1 would catch a piece still rendered at ~70%
+  // of the lane. An early press only sets the pose; the auto-catch in
+  // doTick then catches it when it actually arrives.
   const handleDirection = useCallback((dir: Direction) => {
     if (gameOverRef.current) return;
     setCurrentPose(dir);
     poseRef.current = dir; // sync immediately for doTick
     const currentObjects = objectsRef.current;
+    const f = lastTickRef.current > 0
+      ? Math.min(
+          1,
+          Math.max(
+            0,
+            (performance.now() - lastTickRef.current) /
+              getTickInterval(getLevel(scoreRef.current))
+          )
+        )
+      : 0;
     const catchable = currentObjects.find(
-      (obj) => !obj.caught && obj.direction === dir && obj.step >= CATCH_STEP - 1
+      (obj) =>
+        !obj.caught &&
+        obj.direction === dir &&
+        renderStepFor(obj.step, obj.pendingMiss, f) >= CATCH_STEP - 1
     );
 
     appendDebug(
@@ -355,7 +374,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
       {new URLSearchParams(window.location.search).has('debug') && (
         <div className="absolute left-2 bottom-2 z-30 max-w-[92vw] rounded-md border border-border bg-card/85 p-2 text-xs text-card-foreground">
           <div className="font-semibold">DEBUG CATCH</div>
-          <div>pose: {currentPose ?? 'none'} | press catches step ≥ {CATCH_STEP - 1}, pose catches at {CATCH_STEP}</div>
+          <div>pose: {currentPose ?? 'none'} | press rescues renderStep ≥ {CATCH_STEP - 1}, pose catches at {CATCH_STEP}</div>
           {debugLines.length === 0 ? (
             <div>brak logów…</div>
           ) : (
