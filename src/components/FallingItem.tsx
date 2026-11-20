@@ -14,6 +14,7 @@ interface FallingItemProps {
   emoji: string;
   objectImage?: string;
   objectImageStages?: string[];
+  missedImage?: string;
 }
 
 /**
@@ -29,6 +30,7 @@ const FallingItem = ({
   emoji,
   objectImage,
   objectImageStages,
+  missedImage,
 }: FallingItemProps) => {
   const { direction, step, pendingMiss } = object;
   const renderStep = renderStepFor(step, pendingMiss, frac);
@@ -51,7 +53,8 @@ const FallingItem = ({
         emoji={emoji}
         objectImage={objectImage}
         objectImageStages={objectImageStages}
-        step={step}
+        missedImage={missedImage}
+        renderStep={renderStep}
         sizePx={sizePx}
       />
     </div>

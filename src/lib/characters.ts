@@ -5,6 +5,7 @@ import anteaterSprites from '@/assets/anteater_sprites.png';
 import giraffeSprites from '@/assets/giraffe_sprites.png';
 import jackalSprites from '@/assets/jackal_sprites.webp';
 import jackalBackground from '@/assets/jackal_background.webp';
+import mobileJackalBackground from '@/assets/mobile_jackal_background.png';
 import cookieImage from '@/assets/cookie_game.png';
 import palmImage from '@/assets/palm_game.png';
 import moneyBagImage from '@/assets/moneybag_game.webp';
@@ -87,6 +88,8 @@ export const CHARACTERS: GameCharacter[] = [
     objectImageStages: [moneyBagImage, moneyBagExploding, moneyBagSpilled],
     spriteImage: jackalSprites,
     background: jackalBackground,
+    mobileBackground: mobileJackalBackground,
+    backgroundPosition: '75% center',
     spritePositions: {
       'top-left': { row: 0, col: 0 },
       'top-right': { row: 0, col: 1 },

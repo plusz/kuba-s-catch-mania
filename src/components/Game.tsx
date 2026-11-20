@@ -297,14 +297,17 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
   }, []);
 
   const objectEmoji = character.objectEmoji;
+  const backgroundImage = isMobile
+    ? (character.mobileBackground ?? character.background ?? mobileBackground)
+    : (character.background ?? gameBackground);
 
   return (
     <div
       className={`relative w-full h-screen overflow-hidden ${shaking ? 'animate-shake' : ''}`}
       style={{
-        backgroundImage: `url(${character.background ?? (isMobile ? mobileBackground : gameBackground)})`,
+        backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundPosition: character.backgroundPosition ?? 'center',
       }}
     >
       <GameHud score={score} level={level} currentPose={currentPose} musicEnabled={musicEnabled} onToggleMusic={toggleMusic} />
@@ -323,6 +326,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
           emoji={objectEmoji}
           objectImage={character.objectImage}
           objectImageStages={character.objectImageStages}
+          missedImage={character.missedImage}
         />
       ))}
 
@@ -336,6 +340,7 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
           emoji={objectEmoji}
           objectImage={character.objectImage}
           objectImageStages={character.objectImageStages}
+          missedImage={character.missedImage}
         />
       ))}
 

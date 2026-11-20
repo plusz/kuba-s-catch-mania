@@ -23,6 +23,8 @@ export interface GameCharacter {
   objectImage?: string;
   /** Optional stages for falling object (cycled by progress) */
   objectImageStages?: string[];
+  /** Optional "missed" variant — shown briefly at the paw when a catch is missed */
+  missedImage?: string;
   spriteImage: string;
   /** Sprite size relative to the base size (mouse smaller, anteater bigger) */
   spriteScale?: number;
@@ -30,6 +32,10 @@ export interface GameCharacter {
   objectScale?: number;
   /** Optional custom background for this character */
   background?: string;
+  /** Optional background override for mobile (portrait) viewports */
+  mobileBackground?: string;
+  /** Optional background-position for the custom background (e.g. '75% center' — higher x% pans right) */
+  backgroundPosition?: string;
   /** Sprite sheet layout: 2x2 grid mapping to directions */
   spritePositions: Record<Direction, { row: number; col: number }>;
   /** Whether this character requires a password to unlock */

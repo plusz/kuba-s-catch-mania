@@ -23,6 +23,7 @@ interface DyingItemProps {
   emoji: string;
   objectImage?: string;
   objectImageStages?: string[];
+  missedImage?: string;
 }
 
 /**
@@ -38,6 +39,7 @@ const DyingItem = ({
   emoji,
   objectImage,
   objectImageStages,
+  missedImage,
 }: DyingItemProps) => {
   const aT = Math.min(1, Math.max(0, (now - item.startMs) / CATCH_ANIM_MS));
 
@@ -71,7 +73,8 @@ const DyingItem = ({
         emoji={emoji}
         objectImage={objectImage}
         objectImageStages={objectImageStages}
-        step={item.step}
+        missedImage={missedImage}
+        renderStep={item.step}
         missed={item.missed}
         sizePx={sizePx}
       />

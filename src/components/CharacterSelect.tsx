@@ -13,22 +13,23 @@ interface CharacterSelectProps {
 const UNLOCK_STORAGE_KEY = 'catch-game-unlocked';
 
 /**
- * Card thumbnail: shows exactly the top row (2 poses) of the sprite sheet.
- * The sheet is a 2x2 grid, so the top half has aspect = 2 * sheet aspect —
- * a box with that ratio + object-cover/object-top crops the bottom row off
- * cleanly for every character regardless of sheet proportions.
+ * Card thumbnail: shows exactly one pose (top-left cell) of the 2x2 sprite
+ * sheet. The img is stretched to 200% of the box, so the box shows the
+ * top-left quadrant; box aspect = sheet aspect = cell aspect keeps the pose
+ * undistorted and the tiles a consistent, portrait-ish size.
  */
 const CharacterThumb = ({ char, isLocked }: { char: GameCharacter; isLocked: boolean }) => {
   const aspect = useImageAspect(char.spriteImage);
   return (
     <div
       className="relative h-24 sm:h-32 max-w-full rounded-lg overflow-hidden bg-muted"
-      style={{ aspectRatio: aspect ? String(2 * aspect) : '1.33' }}
+      style={{ aspectRatio: aspect ? String(aspect) : '0.7' }}
     >
       <img
         src={char.spriteImage}
         alt={char.displayName}
-        className={`w-full h-full object-cover object-top ${isLocked ? 'blur-sm grayscale' : ''}`}
+        className={`max-w-none ${isLocked ? 'blur-sm grayscale' : ''}`}
+        style={{ width: '200%', height: '200%', objectFit: 'fill' }}
       />
       {isLocked && (
         <div className="absolute inset-0 flex items-center justify-center">
