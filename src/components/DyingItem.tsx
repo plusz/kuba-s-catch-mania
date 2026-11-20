@@ -7,8 +7,10 @@ import ObjectImage from './ObjectImage';
 export interface DyingEntry {
   id: string;
   direction: Direction;
-  /** Engine step at the moment of catch/miss — animation starts there */
+  /** Engine step at the moment of catch/miss — drives the staged sprite */
   step: number;
+  /** Quantized visual position when the event fired — the animation starts there */
+  renderStep: number;
   missed: boolean;
   /** performance.now() timestamp when the event fired */
   startMs: number;
@@ -49,7 +51,7 @@ const DyingItem = ({
     pos = lane.end;
     sizePx = baseSize * 1.2;
   } else {
-    const from = pointAt(lane, item.step / CATCH_STEP);
+    const from = pointAt(lane, item.renderStep / CATCH_STEP);
     const ease = aT * aT; // accelerate toward the hand
     pos = {
       x: from.x + (lane.end.x - from.x) * ease,
@@ -74,7 +76,7 @@ const DyingItem = ({
         objectImage={objectImage}
         objectImageStages={objectImageStages}
         missedImage={missedImage}
-        renderStep={item.step}
+        renderStep={item.renderStep}
         missed={item.missed}
         sizePx={sizePx}
       />

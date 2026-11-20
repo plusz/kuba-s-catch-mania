@@ -13,6 +13,7 @@ import {
   useViewportSize,
   VISUAL_SUBSTEPS,
   CATCH_ANIM_MS,
+  renderStepFor,
 } from '@/lib/layout';
 import { beginPlay, endPlay } from '@/lib/playTime';
 import { useGameControls } from '@/lib/controls';
@@ -109,10 +110,17 @@ const Game = ({ character, onMenu, onNewGame }: GameProps) => {
 
   /** Queue a short catch/miss animation for an object leaving the list. */
   const pushDying = useCallback((obj: FallingObject, missed: boolean) => {
+    // start the animation from the object's actual visual position, not its
+    // engine step — otherwise a press-catch teleports the piece forward
+    const interval = getTickInterval(getLevel(scoreRef.current));
+    const f = lastTickRef.current > 0
+      ? Math.min(1, Math.max(0, (performance.now() - lastTickRef.current) / interval))
+      : 0;
     const entry: DyingEntry = {
       id: `d-${obj.id}-${missed ? 'm' : 'c'}`,
       direction: obj.direction,
       step: obj.step,
+      renderStep: missed ? CATCH_STEP : renderStepFor(obj.step, obj.pendingMiss, f),
       missed,
       startMs: performance.now(),
     };
