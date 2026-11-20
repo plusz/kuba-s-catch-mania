@@ -144,7 +144,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
         let s = STRINGS[lang][key] ?? STRINGS.en[key] ?? key;
         if (vars) {
           for (const [k, v] of Object.entries(vars)) {
-            s = s.replaceAll(`{${k}}`, String(v));
+            s = s.split(`{${k}}`).join(String(v));
           }
         }
         return s;
