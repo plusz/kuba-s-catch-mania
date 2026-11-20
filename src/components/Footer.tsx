@@ -34,9 +34,17 @@ const Footer = () => {
             className="h-10 transition-opacity hover:opacity-80"
           />
         </a>
-        <span className="inline-flex items-center rounded-lg bg-muted border border-border px-4 py-2 text-xs text-muted-foreground">
-          {t('androidSoon')}
-        </span>
+        <a
+          href="https://play.google.com/store/apps/details?id=pl.orpi.stekikuby&pcampaignid=web_share"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src="/pobierz_z_googleplay.png"
+            alt={t('googlePlayAlt')}
+            className="h-10 transition-opacity hover:opacity-80"
+          />
+        </a>
       </div>
       <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
         <Link to="/polityka-prywatnosci" className="hover:text-secondary transition-colors">
