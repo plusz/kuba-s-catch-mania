@@ -30,6 +30,8 @@ const Footer = () => (
       </Link>
       <span aria-hidden="true">·</span>
       <span>© 2026 Zwierzęta Detektywi</span>
+      <span aria-hidden="true">·</span>
+      <span className="opacity-60" title="wersja buildu">v {__BUILD_ID__}</span>
     </nav>
   </footer>
 );
